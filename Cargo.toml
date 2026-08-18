@@ -265,14 +265,26 @@ orbital-motion = { path = "../../L0-upstream-cores/orbital/orbital-motion", defa
 orbital-style = { path = "../../L0-upstream-cores/orbital/orbital-style", default-features = false }
 orbital-data = { path = "../../L0-upstream-cores/orbital/orbital-data" }
 
-# Transitive kits may still git-pin older Valence/Boson/Photon; force one crates.io graph.
+# Local Valence checkout (mem SQL LIKE / search OR filter fix lives here).
+[patch.crates-io]
+uf-valence = { path = "../../L0-upstream-cores/valence/valence" }
+uf-valence-core = { path = "../../L0-upstream-cores/valence/valence-core" }
+uf-valence-codegen = { path = "../../L0-upstream-cores/valence/valence-codegen" }
+uf-valence-macros = { path = "../../L0-upstream-cores/valence/valence-macros" }
+uf-valence-telemetry = { path = "../../L0-upstream-cores/valence/valence-telemetry" }
+uf-valence-backend-mem = { path = "../../L0-upstream-cores/valence/valence-backend-mem" }
+uf-valence-backend-sqlite = { path = "../../L0-upstream-cores/valence/valence-backend-sqlite" }
+uf-valence-backend-sql = { path = "../../L0-upstream-cores/valence/valence-backend-sql" }
+uf-valence-schema-dsl = { path = "../../L0-upstream-cores/valence/valence-schema-dsl" }
+
+# Transitive kits may still git-pin older Valence; unify onto the local extract.
 [patch."https://github.com/unified-field-dev/valence"]
-uf-valence = { version = "0.1.5" }
-uf-valence-core = { version = "0.1.5" }
-uf-valence-codegen = { version = "0.1.5" }
-uf-valence-macros = { version = "0.1.5" }
-uf-valence-telemetry = { version = "0.1.5" }
-uf-valence-backend-mem = { version = "0.1.5" }
-uf-valence-backend-sqlite = { version = "0.1.5" }
-uf-valence-backend-sql = { version = "0.1.5" }
-uf-valence-schema-dsl = { version = "0.1.5" }
+uf-valence = { path = "../../L0-upstream-cores/valence/valence" }
+uf-valence-core = { path = "../../L0-upstream-cores/valence/valence-core" }
+uf-valence-codegen = { path = "../../L0-upstream-cores/valence/valence-codegen" }
+uf-valence-macros = { path = "../../L0-upstream-cores/valence/valence-macros" }
+uf-valence-telemetry = { path = "../../L0-upstream-cores/valence/valence-telemetry" }
+uf-valence-backend-mem = { path = "../../L0-upstream-cores/valence/valence-backend-mem" }
+uf-valence-backend-sqlite = { path = "../../L0-upstream-cores/valence/valence-backend-sqlite" }
+uf-valence-backend-sql = { path = "../../L0-upstream-cores/valence/valence-backend-sql" }
+uf-valence-schema-dsl = { path = "../../L0-upstream-cores/valence/valence-schema-dsl" }

@@ -6400,8 +6400,6 @@ dependencies = [
 [[package]]
 name = "uf-valence"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a49c7bf2889e9abc13c3015ff185a71bbd275c63bacec1773f44f231cb774ec"
 dependencies = [
  "uf-valence-backend-hybrid",
  "uf-valence-backend-indradb",
@@ -6415,8 +6413,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-hybrid"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a5ec4d0d56cc44a00d7b8f6f2068c6c9310dfc5a0244f9e7cb4204ac7ba66ad"
 dependencies = [
  "async-trait",
  "serde",
@@ -6429,8 +6425,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-indradb"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "779aaf67c5ea8bc97d2551465cefae5536169a3381a3a75295b62951e64af548"
 dependencies = [
  "async-trait",
  "indradb-lib",
@@ -6443,8 +6437,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-mem"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c843bb8e05027d51f0c197f023faf7c9dc6f71a62db5c57fc9b9afa5a54479b1"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -6455,8 +6447,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-postgres"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eab3eabff4a9989f0ecec1de9949a83c3430908b215398577c3bead43a2d697d"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -6469,8 +6459,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-sql"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbd4127bb24c9358044ca9d3c8f16a2b0afa09ae2661b9d75f33fd760cb5a347"
 dependencies = [
  "serde",
  "serde_json",
@@ -6485,8 +6473,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-sqlite"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b653090253e6ac01b97e2daa3ecf223a7d1a141b5a10fb332c6e7631ec86b02"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -6499,8 +6485,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-codegen"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7db21e72e98ba5fa5d2cf4b2eb5e5910e48790770a8e4b039d44706b31f64a67"
 dependencies = [
  "anyhow",
  "prettyplease",
@@ -6514,8 +6498,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-core"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "002bf881db2a03a1cd104ccfb9fd1449c7a6c059d659ffc9457554469bf357ea"
 dependencies = [
  "async-trait",
  "chrono",
@@ -6534,8 +6516,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-macros"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d761863d394642003dcece088561a2cc9340133bc084cb4d455bfd5d408956a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -6546,8 +6526,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-schema-dsl"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50d3b322bb1112632d4c3c1dd554b2f04278ca176ecbcf41a1f652c75d5daf6a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -6557,8 +6535,6 @@ dependencies = [
 [[package]]
 name = "uf-valence-telemetry"
 version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32bc3941eb301b6232606dc24659c6e8f15d077c93532d235862b1938dc463d7"
 dependencies = [
  "serde_json",
 ]
