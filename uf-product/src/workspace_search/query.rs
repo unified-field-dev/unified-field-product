@@ -15,7 +15,11 @@ const ABSOLUTE_MAX_RESULTS: u32 = 50;
 ///
 /// # Errors
 ///
-/// See [`WorkspaceSearchError`].
+/// Returns [`WorkspaceSearchError::Unauthenticated`] for anonymous actors,
+/// [`WorkspaceSearchError::InvalidActor`] for System / ServiceUser actors,
+/// [`WorkspaceSearchError::InvalidQuery`] when the query text fails validation
+/// (empty, too long, or otherwise rejected), or [`WorkspaceSearchError::Valence`]
+/// when the index read fails.
 ///
 /// # Examples
 ///

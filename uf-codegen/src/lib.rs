@@ -36,11 +36,17 @@
 //! use uf_codegen::{generate_registered_routes, RoutesCodegenConfig, RoutesCodegenError};
 //!
 //! fn main() -> Result<(), RoutesCodegenError> {
+//!     // Host build.rs usually sits one level under the workspace root.
+//!     let workspace_root = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap())
+//!         .parent()
+//!         .expect("host crate parent is workspace root")
+//!         .to_path_buf();
 //!     generate_registered_routes(&RoutesCodegenConfig {
-//!         workspace_root: PathBuf::from(std::env::var("CARGO_WORKSPACE_DIR").unwrap_or_default()),
+//!         workspace_root,
 //!         out_dir: PathBuf::from(std::env::var("OUT_DIR").unwrap()),
 //!         extra_packages: vec![],
-//!         excluded_packages: vec!["setup-wizard-app".to_string()],
+//!         // List package names to skip; leave empty to scan every member.
+//!         excluded_packages: vec![],
 //!     })
 //! }
 //! ```
@@ -64,6 +70,8 @@
 //! - `uf-product-macros` — `uf_app!` fields scanned by this crate.
 //! - `uf-product::routes` — runtime registry built from inventory (separate from these includes).
 //! - `uf-product/examples` — `app_route_paths` / `auth_shell_host` for runtime discovery smoke.
+
+#![deny(clippy::missing_errors_doc)]
 
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};

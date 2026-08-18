@@ -10,8 +10,11 @@ use super::WorkspaceSearchHit;
 ///
 /// # Errors
 ///
-/// Unauthenticated callers, invalid query text, or Valence failures map to
-/// [`ServerFnError`].
+/// Returns [`ServerFnError`] when the caller is not authenticated (`"Not authenticated"`),
+/// session Valence cannot be built, [`super::query`] fails (message is the
+/// [`super::WorkspaceSearchError`] display string: unauthenticated, invalid actor,
+/// invalid query, or Valence failure), or the `ssr` feature is off
+/// (`"query_workspace_search requires the ssr feature"`).
 #[server(QueryWorkspaceSearch)]
 pub async fn query_workspace_search(
     query: String,

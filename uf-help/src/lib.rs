@@ -109,6 +109,7 @@
 //! ```
 
 #![allow(missing_docs)]
+#![deny(clippy::missing_errors_doc)]
 
 pub use inventory;
 pub use uf_help_macros::help_spotlight_step;

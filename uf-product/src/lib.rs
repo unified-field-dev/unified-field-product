@@ -50,8 +50,9 @@
 //!    when you need the [`AuthSession::Anonymous`] branch.
 //!
 //! `rust,ignore` because this needs a Leptos runtime. Copy it into a `ssr`/`hydrate`
-//! host. Compile-checked neighbors: `auth_shell_host` (Axum inventory gate),
-//! `examples/shell-chrome-host` (full shell).
+//! host. Lib doctests are disabled (`[lib] doctest = false`); use `examples/` and
+//! host crates for compile-checked teaching. Compile-checked neighbors:
+//! `auth_shell_host` (Axum inventory gate), `examples/shell-chrome-host` (full shell).
 //!
 //! ```rust,ignore
 //! use leptos::prelude::*;
@@ -127,6 +128,7 @@
 // modules expand many public items without local rustdoc. Prefer documenting new
 // product-owned APIs at the item; do not widen this allow for ordinary new modules.
 #![allow(missing_docs)]
+#![deny(clippy::missing_errors_doc)]
 
 pub use orbital_zone_a::context;
 pub use orbital_zone_a::models;

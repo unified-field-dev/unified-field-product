@@ -82,6 +82,9 @@
 //! cargo check -p shell-chrome-host --features ssr
 //! ```
 //!
+//! Lib doctests are disabled (`[lib] doctest = false`); use workspace hosts such as
+//! `examples/shell-chrome-host` for compile-checked composition.
+//!
 //! ## Where to look next
 //!
 //! - [`UnifiedFieldShellLayout`] — top-level shell composition.

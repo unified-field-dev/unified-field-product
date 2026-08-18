@@ -67,13 +67,18 @@ uf-product         (session, guards, registry, appearance, design-system APIs)
 
 ```rust,ignore
 use leptos::prelude::*;
-use uf_product::{use_auth_state, routes::RequireAuthenticated};
+use uf_product::{use_authenticated_user, routes::RequireAuthenticated};
 
 #[component]
 fn ProtectedPage() -> impl IntoView {
+    let user = use_authenticated_user();
     view! {
         <RequireAuthenticated>
-            <p>{move || format!("Signed in as {}", use_auth_state().get().is_authenticated())}</p>
+            <p>{move || {
+                user.get()
+                    .and_then(|u| u.display_name.clone())
+                    .unwrap_or_else(|| "you".to_string())
+            }}</p>
         </RequireAuthenticated>
     }
 }

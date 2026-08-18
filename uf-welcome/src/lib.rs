@@ -69,6 +69,7 @@
 
 #![allow(missing_docs)]
 #![allow(clippy::unused_unit, unused_imports)]
+#![deny(clippy::missing_errors_doc)]
 
 use leptos::prelude::*;
 #[cfg(feature = "lazy-routes")]

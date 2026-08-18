@@ -156,6 +156,11 @@ const fn collect_registered_apps() -> Vec<AppDirectoryItem> {
 ///
 /// **Public by design:** returns in-memory `uf_app!` registration metadata only
 /// (name, slug, description, route path). No user data or Valence reads.
+///
+/// # Errors
+///
+/// Returns [`ServerFnError`] when the server-fn transport or SSR extractor fails.
+/// An empty registry still returns `Ok` with zero items.
 #[uf_product_macros::server]
 pub async fn get_apps() -> Result<Vec<AppDirectoryItem>, ServerFnError> {
     maybe_simulate_delay().await;

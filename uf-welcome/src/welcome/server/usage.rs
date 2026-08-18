@@ -32,6 +32,12 @@ fn usage_router() -> Option<std::sync::Arc<spectra::SpectraRouter>> {
 ///
 /// Returns an empty list when the viewer or Spectra handle is unavailable
 /// (degrade for hosts without Higgs / Spectra).
+///
+/// # Errors
+///
+/// Does not return [`ServerFnError`] for missing viewer, missing Spectra, or
+/// query failure; those paths degrade to `Ok([])`. Transport / extractor failures
+/// from the Leptos server-fn layer may still surface as [`ServerFnError`].
 #[uf_product_macros::server]
 pub async fn get_recent_apps() -> Result<Vec<AppLinkDto>, ServerFnError> {
     #[cfg(feature = "ssr")]
@@ -59,6 +65,12 @@ pub async fn get_recent_apps() -> Result<Vec<AppLinkDto>, ServerFnError> {
 }
 
 /// Per-user most-used apps from Spectra page-view telemetry.
+///
+/// # Errors
+///
+/// Same degrade-to-`Ok([])` contract as [`get_recent_apps`]: missing viewer,
+/// missing Spectra, or query failure do not become [`ServerFnError`]. Transport
+/// failures may still surface as [`ServerFnError`].
 #[uf_product_macros::server]
 pub async fn get_my_most_used() -> Result<Vec<AppLinkDto>, ServerFnError> {
     #[cfg(feature = "ssr")]
@@ -85,6 +97,12 @@ pub async fn get_my_most_used() -> Result<Vec<AppLinkDto>, ServerFnError> {
 }
 
 /// Fleet-wide popular apps from Spectra page-view telemetry.
+///
+/// # Errors
+///
+/// Same degrade-to-`Ok([])` contract as [`get_recent_apps`]. A signed-in (or e2e)
+/// viewer is still required before the fleet query runs; without one the call
+/// returns `Ok([])`. Transport failures may still surface as [`ServerFnError`].
 #[uf_product_macros::server]
 pub async fn get_popular_apps() -> Result<Vec<AppLinkDto>, ServerFnError> {
     #[cfg(feature = "ssr")]

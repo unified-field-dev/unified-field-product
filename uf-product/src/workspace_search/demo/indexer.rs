@@ -21,6 +21,13 @@ pub struct IndexedDemoIndexer;
 
 #[async_trait]
 impl SideEffect<IndexedDemoItem> for IndexedDemoIndexer {
+    /// Keep the workspace search document in sync with the demo source row.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`valence::Error::Internal`] when delete/mutate payloads are missing
+    /// `before`/`after`, when the title starts with [`FORCE_SE_ERROR_TITLE_PREFIX`]
+    /// (test harness), or when [`SearchDocumentWriter`] upsert/delete fails.
     async fn on_mutation(&self, mutation: &Mutation<'_, IndexedDemoItem>) -> valence::Result<()> {
         let v = mutation.valence();
         match *mutation.kind() {

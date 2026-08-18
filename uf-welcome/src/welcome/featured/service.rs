@@ -75,6 +75,10 @@ async fn find_by_app_id(
 /// List featured rows ordered by ascending `ordinal`.
 ///
 /// Rows whose `app_id` is no longer in [`AppRegistry`] are omitted (stale catalog).
+///
+/// # Errors
+///
+/// Returns [`FeaturedError::Service`] when the Valence list query fails.
 pub async fn list(v: &Valence) -> Result<Vec<FeaturedAppRow>, FeaturedError> {
     let rows = WelcomeFeaturedApp::query(v)
         .order_by_ordinal(valence::query::SortDirection::Asc)
@@ -92,6 +96,11 @@ pub async fn list(v: &Valence) -> Result<Vec<FeaturedAppRow>, FeaturedError> {
 }
 
 /// Remove every featured row (e2e seed isolation).
+///
+/// # Errors
+///
+/// Propagates [`list`] / [`remove`] failures (`FeaturedError::Service` or
+/// [`FeaturedError::NotFound`] if a row disappears mid-clear).
 pub async fn clear_all(v: &Valence) -> Result<(), FeaturedError> {
     let rows = list(v).await?;
     for row in rows {
@@ -103,6 +112,12 @@ pub async fn clear_all(v: &Valence) -> Result<(), FeaturedError> {
 /// Insert a featured row for a registered `app_id` at `ordinal`.
 ///
 /// Expects a System [`Valence`] (create policy is `SYSTEM_ONLY`).
+///
+/// # Errors
+///
+/// Returns [`FeaturedError::UnknownApp`] when `app_id` is missing from
+/// [`AppRegistry`], [`FeaturedError::Duplicate`] when the app is already featured,
+/// or [`FeaturedError::Service`] on Valence create/upsert failure.
 pub async fn add(v: &Valence, app_id: &str, ordinal: i64) -> Result<FeaturedAppRow, FeaturedError> {
     ensure_known_app(app_id)?;
     if find_by_app_id(v, app_id).await?.is_some() {
@@ -127,6 +142,12 @@ pub async fn add(v: &Valence, app_id: &str, ordinal: i64) -> Result<FeaturedAppR
 ///
 /// Expects a System [`Valence`] (delete policy is `SYSTEM_ONLY`).
 /// Physically deletes the row (catalog rows do not wait on a Chronon deletion worker).
+///
+/// # Errors
+///
+/// Returns [`FeaturedError::NotFound`] when neither record id nor `app_id` matches,
+/// or [`FeaturedError::Service`] on Valence get/delete failure (including a row
+/// missing a record id).
 pub async fn remove(v: &Valence, app_id_or_id: &str) -> Result<(), FeaturedError> {
     let key = app_id_or_id;
     let existing = match WelcomeFeaturedApp::get(key, v)
@@ -165,6 +186,11 @@ pub async fn remove(v: &Valence, app_id_or_id: &str) -> Result<(), FeaturedError
 ///
 /// Every `app_id` must already be featured; missing keys return [`FeaturedError::NotFound`].
 /// Expects a System [`Valence`] (update policy is `SYSTEM_ONLY`).
+///
+/// # Errors
+///
+/// Returns [`FeaturedError::NotFound`] when an `app_id` is not featured (or its
+/// row has no record id), or [`FeaturedError::Service`] on Valence update failure.
 pub async fn reorder(v: &Valence, app_ids: &[String]) -> Result<(), FeaturedError> {
     let now = Utc::now();
     for (ordinal, app_id) in app_ids.iter().enumerate() {

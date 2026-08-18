@@ -20,20 +20,19 @@ use std::path::PathBuf;
 use uf_codegen::{generate_registered_routes, RoutesCodegenConfig};
 
 fn main() -> anyhow::Result<()> {
+    // Host build.rs usually sits one level under the workspace root.
+    let workspace_root = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap())
+        .parent()
+        .expect("host crate parent is workspace root")
+        .to_path_buf();
     generate_registered_routes(&RoutesCodegenConfig {
-        workspace_root: PathBuf::from(
-            std::env::var("CARGO_WORKSPACE_DIR").unwrap_or_else(|_| {
-                PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap())
-                    .parent()
-                    .unwrap()
-                    .to_string_lossy()
-                    .into_owned()
-            }),
-        ),
+        workspace_root,
         out_dir: PathBuf::from(std::env::var("OUT_DIR").unwrap()),
         extra_packages: vec![],
-        excluded_packages: vec!["setup-wizard-app".to_string()],
-    })
+        // List package names to skip; leave empty to scan every member.
+        excluded_packages: vec![],
+    })?;
+    Ok(())
 }
 ```
 

@@ -82,6 +82,11 @@ pub struct PrivateVulnReport {
 #[async_trait::async_trait]
 pub trait GitHubFeedbackClient: Send + Sync {
     /// Create a public issue. Returns the issue HTML URL.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`HelpError::GitHubUpstream`] on transport failure, non-success HTTP
+    /// status, or a response missing `html_url`.
     async fn create_issue(
         &self,
         owner: &str,
@@ -90,6 +95,11 @@ pub trait GitHubFeedbackClient: Send + Sync {
     ) -> Result<String, HelpError>;
 
     /// File a private vulnerability report (never a public issue).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`HelpError::GitHubUpstream`] on transport failure or non-success
+    /// HTTP status from the private reporting API.
     async fn create_private_vulnerability_report(
         &self,
         owner: &str,

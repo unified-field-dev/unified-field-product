@@ -154,6 +154,7 @@
 // crate-root Features / Concern → API tables are the integrator path.
 #![allow(missing_docs)]
 #![allow(clippy::unused_unit, unused_imports)]
+#![deny(clippy::missing_errors_doc)]
 
 use leptos::prelude::*;
 use leptos_router::components::{ParentRoute, Route};

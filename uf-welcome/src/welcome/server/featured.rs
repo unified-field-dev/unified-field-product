@@ -152,6 +152,12 @@ impl WelcomeAdminAccess {
 }
 
 /// Whether the signed-in user may manage featured apps (`WelcomeAdmin`).
+///
+/// # Errors
+///
+/// Does not return [`ServerFnError`] for missing session, Higgs, Valence, or
+/// permission-check failure; those paths return `Ok(false)`. Transport /
+/// extractor failures may still surface as [`ServerFnError`].
 #[uf_product_macros::server]
 pub async fn can_manage_welcome_featured() -> Result<bool, ServerFnError> {
     #[cfg(feature = "ssr")]
@@ -184,6 +190,12 @@ pub async fn can_manage_welcome_featured() -> Result<bool, ServerFnError> {
 }
 
 /// Featured apps for the welcome page (authenticated Valence read).
+///
+/// # Errors
+///
+/// Does not return [`ServerFnError`] for anonymous viewers, missing Valence, or
+/// catalog list failure; those paths degrade to `Ok([])`. Transport / extractor
+/// failures may still surface as [`ServerFnError`].
 #[uf_product_macros::server]
 pub async fn get_featured_apps() -> Result<Vec<AppLinkDto>, ServerFnError> {
     #[cfg(feature = "ssr")]
@@ -223,6 +235,12 @@ pub async fn get_featured_apps() -> Result<Vec<AppLinkDto>, ServerFnError> {
 }
 
 /// Apps available to feature (WelcomeAdmin).
+///
+/// # Errors
+///
+/// Returns [`ServerFnError`] when the caller lacks `WelcomeAdmin` (permission
+/// denied payload), Higgs/Valence setup fails under `admin-permissions`, or the
+/// server-fn transport fails. Without the `ssr` feature this returns `Ok([])`.
 #[uf_product_macros::server]
 pub async fn list_manageable_apps() -> Result<Vec<ManageableAppDto>, ServerFnError> {
     #[cfg(feature = "ssr")]
@@ -247,6 +265,15 @@ pub async fn list_manageable_apps() -> Result<Vec<ManageableAppDto>, ServerFnErr
 }
 
 /// Add an app to the featured catalog (WelcomeAdmin).
+///
+/// # Errors
+///
+/// Returns [`ServerFnError`] when the caller lacks `WelcomeAdmin`, system Valence
+/// cannot be built, [`crate::welcome::featured::add`] fails (mapped from
+/// [`crate::welcome::featured::FeaturedError`]: unknown app, duplicate, or
+/// Valence service failure), the new row's `app_id` is missing from
+/// [`uf_product::AppRegistry`], or the call is made without the `ssr` feature
+/// (`"ssr only"`).
 #[uf_product_macros::server]
 pub async fn add_featured_app(app_id: String, ordinal: i64) -> Result<AppLinkDto, ServerFnError> {
     #[cfg(feature = "ssr")]
@@ -277,6 +304,13 @@ pub async fn add_featured_app(app_id: String, ordinal: i64) -> Result<AppLinkDto
 }
 
 /// Remove a featured app by app id or record id (WelcomeAdmin).
+///
+/// # Errors
+///
+/// Returns [`ServerFnError`] when the caller lacks `WelcomeAdmin`, system Valence
+/// cannot be built, [`crate::welcome::featured::remove`] fails (mapped from
+/// [`crate::welcome::featured::FeaturedError`]: not found or Valence service
+/// failure), or the call is made without the `ssr` feature (`"ssr only"`).
 #[uf_product_macros::server]
 pub async fn remove_featured_app(app_id_or_id: String) -> Result<(), ServerFnError> {
     #[cfg(feature = "ssr")]
@@ -295,6 +329,13 @@ pub async fn remove_featured_app(app_id_or_id: String) -> Result<(), ServerFnErr
 }
 
 /// Reorder featured apps by app_id list (WelcomeAdmin).
+///
+/// # Errors
+///
+/// Returns [`ServerFnError`] when the caller lacks `WelcomeAdmin`, system Valence
+/// cannot be built, [`crate::welcome::featured::reorder`] fails (mapped from
+/// [`crate::welcome::featured::FeaturedError`]: not found or Valence service
+/// failure), or the call is made without the `ssr` feature (`"ssr only"`).
 #[uf_product_macros::server]
 pub async fn reorder_featured_apps(app_ids: Vec<String>) -> Result<(), ServerFnError> {
     #[cfg(feature = "ssr")]

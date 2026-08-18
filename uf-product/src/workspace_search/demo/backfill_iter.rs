@@ -11,6 +11,11 @@ pub struct IndexedDemoBackfillIter;
 
 impl IndexedDemoBackfillIter {
     /// Run when the index row is missing or title/link drifted from the source.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`valence::Error`] when the System-elevated index `get` fails.
+    /// A source row without an id skips (`Ok(IterEvaluation::skip)`), not `Err`.
     pub async fn should_run(
         &self,
         row: &IndexedDemoItem,
@@ -38,6 +43,11 @@ impl IndexedDemoBackfillIter {
     }
 
     /// Upsert the index row for this source (same mapping as the SideEffect).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`valence::Error::Internal`] when the source row has no id, or when
+    /// [`SearchDocumentWriter::upsert`] fails (mapped into `Internal`).
     pub async fn execute(&self, row: &IndexedDemoItem, valence: &Valence) -> valence::Result<()> {
         let Some(rid) = row.id() else {
             return Err(valence::Error::Internal(

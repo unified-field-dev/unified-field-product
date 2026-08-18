@@ -48,6 +48,11 @@ pub struct UsageAppLink {
 }
 
 /// Recent apps for `viewer_key` (session user id).
+///
+/// # Errors
+///
+/// Returns [`UsageQueryError`] from [`recent_apps_for_viewer_on`] when Spectra
+/// query fails ([`UsageQueryError::QueryFailed`]).
 pub async fn recent_apps_for_viewer(
     spectra: &Spectra,
     viewer_key: &str,
@@ -57,6 +62,10 @@ pub async fn recent_apps_for_viewer(
 }
 
 /// Recent apps against an explicit Spectra router (e2e hosts / tests).
+///
+/// # Errors
+///
+/// Returns [`UsageQueryError::QueryFailed`] when the Spectra events query fails.
 pub async fn recent_apps_for_viewer_on(
     router: &spectra_core::SpectraRouter,
     viewer_key: &str,
@@ -71,6 +80,11 @@ pub async fn recent_apps_for_viewer_on(
 }
 
 /// Most-used apps for `viewer_key`.
+///
+/// # Errors
+///
+/// Returns [`UsageQueryError`] from [`most_used_for_viewer_on`] when Spectra
+/// query fails ([`UsageQueryError::QueryFailed`]).
 pub async fn most_used_for_viewer(
     spectra: &Spectra,
     viewer_key: &str,
@@ -80,6 +94,10 @@ pub async fn most_used_for_viewer(
 }
 
 /// Most-used apps against an explicit Spectra router.
+///
+/// # Errors
+///
+/// Returns [`UsageQueryError::QueryFailed`] when the Spectra events query fails.
 pub async fn most_used_for_viewer_on(
     router: &spectra_core::SpectraRouter,
     viewer_key: &str,
@@ -94,6 +112,11 @@ pub async fn most_used_for_viewer_on(
 }
 
 /// Fleet-wide popular apps (authenticated callers only — enforced by welcome).
+///
+/// # Errors
+///
+/// Returns [`UsageQueryError`] from [`popular_apps_on`] when Spectra query fails
+/// ([`UsageQueryError::QueryFailed`]).
 pub async fn popular_apps(
     spectra: &Spectra,
     opts: &UsageQueryOptions,
@@ -102,6 +125,10 @@ pub async fn popular_apps(
 }
 
 /// Popular apps against an explicit Spectra router.
+///
+/// # Errors
+///
+/// Returns [`UsageQueryError::QueryFailed`] when the Spectra events query fails.
 pub async fn popular_apps_on(
     router: &spectra_core::SpectraRouter,
     opts: &UsageQueryOptions,
