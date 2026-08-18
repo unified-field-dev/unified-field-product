@@ -13,7 +13,7 @@
 //! | Client source selection | [`SearchSourceKey`] |
 //! | Result rows for the picker | [`SearchSourceItem`] |
 //! | Implement one backend source (`ssr`) | `SearchSourceProvider`, `SearchSourceDescriptor` |
-//! | Provider / fan-out failures (`ssr`) | [`SearchSourceError`] |
+//! | Provider / fan-out failures (`ssr`) | `SearchSourceError` |
 //! | Query many sources (`ssr`) | `SearchSourceRegistry` |
 //!
 //! ## Features
