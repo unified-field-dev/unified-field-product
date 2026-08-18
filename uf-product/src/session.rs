@@ -120,7 +120,7 @@ fn session_apply_is_current(scheduled: u32, latest: u32) -> bool {
 /// ```rust,ignore
 /// use uf_product::{init_auth_resource, provide_auth_context};
 ///
-/// let auth = provide_auth_context();
+/// let auth = provide_auth_context(Default::default());
 /// let _auth_resource = init_auth_resource(&auth);
 /// ```
 pub fn init_auth_resource(auth: &AuthContext) -> Resource<Result<AuthSession, ServerFnError>> {

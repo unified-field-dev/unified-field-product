@@ -16,10 +16,12 @@
 //!
 //! | Task | Start here | Example / errors |
 //! |------|------------|------------------|
-//! | Reactive session / signed-in user | [`AuthContext`], [`use_auth_state`], [`use_authenticated_user`] | Getting started below; profile via [`use_authenticated_user`] |
-//! | Load session from host middleware | [`session`], [`get_session`], [`init_auth_resource`] | [`get_session`] # Errors when SSR auth extract fails |
+//! | Provide session context once (host root) | [`provide_auth_context`], then [`init_auth_resource`] | Getting started; [`provide_auth_context`] / [`init_auth_resource`] `# Examples` |
+//! | Show the signed-in name / email | [`use_authenticated_user`] | Getting started; [`use_authenticated_user`] `# Examples` |
+//! | Branch anonymous vs signed-in | [`use_auth_state`] | Getting started; [`use_auth_state`] `# Examples` |
+//! | Load session from host middleware | [`get_session`] | [`get_session`] `# Errors` when SSR auth extract fails |
 //! | Auth dialog (sign-in modal) | [`use_auth_dialog_controller`], [`AuthDialogController`] | Shell layout + `provide_shell_auth_menu` |
-//! | Gate a page behind login | [`routes::RequireAuthenticated`] | [`routes`] module example; named permissions fail closed |
+//! | Gate a page behind login | [`routes::RequireAuthenticated`] | Getting started; [`routes`] module example; named permissions fail closed |
 //! | Auth route + return path (no shell dialog) | [`routes::auth_signin_href`], [`routes::auth_signup_href`] | Used when no [`AuthDialogController`] |
 //! | Help skip while a gate is showing | [`provide_access_gate_state`], [`AccessGateActive`] | Pair with [`routes::RequireAuthenticated`] |
 //! | App registration + route discovery (SSR) | [`routes::AppRegistration`], [`routes::AppRegistry`] | `uf_app_registration` example; [`routes`] inventory vs mounted routes |
@@ -27,7 +29,7 @@
 //! | Design-system primitives / components | [`components`], [`primitives`], [`models`], [`nav`] | Re-exported from `orbital-zone-a` for one dependency path |
 //! | Picker / in-page search sources | [`search_sources`] | `uf-search-core` registry contracts |
 //! | Content index / AppBar workspace search | [`workspace_search`] | [`workspace_search`] writer + [`workspace_search::WorkspaceSearchError`] |
-//! | Light/dark/brand appearance | [`theme`], [`services`] | [`services`] `save_my_appearance` # Errors |
+//! | Light/dark/brand appearance | [`theme`], [`services`] | [`services`] `save_my_appearance` `# Errors` |
 //! | Page-view / appearance analytics | [`telemetry`] | [`PageViewTracker`] for `uf_app!` products |
 //! | Shell chrome (sibling crate) | `uf-integrations` | App bar, `WorkspaceSearch`, picker UI |
 //!
@@ -40,21 +42,43 @@
 //!
 //! ## Getting started
 //!
-//! Provide auth once near the router root, then gate pages and read the signed-in
-//! profile (not the `is_authenticated()` bool):
+//! Call these in order:
+//!
+//! 1. [`provide_auth_context`] — put [`AuthContext`] into Leptos context (once, near `Router`).
+//! 2. [`init_auth_resource`] — fetch [`get_session`] and write it into that context.
+//! 3. In pages: [`use_authenticated_user`] for profile fields, or [`use_auth_state`]
+//!    when you need the [`AuthSession::Anonymous`] branch.
+//!
+//! `rust,ignore` because this needs a Leptos runtime. Copy it into a `ssr`/`hydrate`
+//! host. Compile-checked neighbors: `auth_shell_host` (Axum inventory gate),
+//! `examples/shell-chrome-host` (full shell).
 //!
 //! ```rust,ignore
 //! use leptos::prelude::*;
 //! use uf_product::{
-//!     init_auth_resource, provide_auth_context, use_authenticated_user,
-//!     routes::RequireAuthenticated,
+//!     init_auth_resource, provide_auth_context, use_auth_state, use_authenticated_user,
+//!     routes::RequireAuthenticated, AuthSession,
 //! };
 //!
 //! #[component]
 //! fn AppRoot() -> impl IntoView {
 //!     let auth = provide_auth_context(Default::default());
 //!     let _session = init_auth_resource(&auth);
-//!     view! { <ProtectedPage /> }
+//!     view! {
+//!         <SessionChip />
+//!         <ProtectedPage />
+//!     }
+//! }
+//!
+//! #[component]
+//! fn SessionChip() -> impl IntoView {
+//!     let session = use_auth_state();
+//!     view! {
+//!         <span>{move || match session.get() {
+//!             AuthSession::Anonymous(_) => "Guest",
+//!             AuthSession::Authenticated(_) => "Signed in",
+//!         }}</span>
+//!     }
 //! }
 //!
 //! #[component]
@@ -72,12 +96,16 @@
 //! }
 //! ```
 //!
+//! After sign-in or sign-out, call [`AuthContext::trigger_refresh`] so
+//! [`init_auth_resource`] re-runs [`get_session`].
+//!
 //! ## Examples
 //!
 //! | Level | Where | What |
 //! |-------|-------|------|
-//! | Highlight | Getting started above | `init_auth_resource` + `RequireAuthenticated` + `use_authenticated_user` |
-//! | Mid / detailed | workspace `uf-product/examples/` | `uf_app_registration` (`uf_app!`), `app_route_paths`, `auth_shell_host` (Axum inventory gate) |
+//! | Highlight | Getting started above | provide → hydrate → `use_authenticated_user` / `use_auth_state` |
+//! | Mid | [`provide_auth_context`], [`use_authenticated_user`], [`use_auth_state`] | Same flow on the items |
+//! | Detailed | workspace `uf-product/examples/` | `uf_app_registration` (`uf_app!`), `app_route_paths`, `auth_shell_host` (Axum inventory gate) |
 //! | Nested UI | workspace `examples/` | `shell-chrome-host`, `component-preview-host` |
 //!
 //! ```bash
@@ -87,7 +115,7 @@
 //!
 //! ## Where to look next
 //!
-//! - [`AuthContext`] / [`use_auth_state`] — reactive session state.
+//! - [`provide_auth_context`] / [`use_authenticated_user`] / [`use_auth_state`] — session.
 //! - [`permissions`] — permission manifest contracts.
 //! - [`routes`] — app registration + route guards.
 //! - `uf-integrations` — shell app bar, `WorkspaceSearch`, and `SearchSourcePicker`.
@@ -148,9 +176,75 @@ pub use auth_dialog::{
     provide_auth_dialog_controller, use_auth_dialog_controller, AuthDialogController,
     AuthDialogIntent,
 };
-pub use context::{
-    provide_auth_context, use_auth_context, use_auth_state, use_authenticated_user, AuthContext,
-};
+/// Shared session signals. Provide once with [`provide_auth_context`]; pages read
+/// [`use_authenticated_user`] or [`use_auth_state`] instead of constructing this.
+///
+/// After sign-in or sign-out, call [`AuthContext::trigger_refresh`].
+pub use context::AuthContext;
+
+/// Insert [`AuthContext`] into Leptos context. Call once near the host `Router`.
+///
+/// Pair with [`init_auth_resource`] so [`get_session`] fills the session signal.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// use uf_product::{init_auth_resource, provide_auth_context};
+///
+/// let auth = provide_auth_context(Default::default());
+/// let _session = init_auth_resource(&auth);
+/// ```
+pub use context::provide_auth_context;
+
+/// Handle for [`AuthContext::trigger_refresh`] and `session_loaded`.
+///
+/// # Panics
+///
+/// Panics if [`provide_auth_context`] has not run in an ancestor.
+pub use context::use_auth_context;
+
+/// Full [`AuthSession`] memo: match [`AuthSession::Anonymous`] vs
+/// [`AuthSession::Authenticated`].
+///
+/// Prefer [`use_authenticated_user`] when you only need profile fields.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// use uf_product::{use_auth_state, AuthSession};
+///
+/// let session = use_auth_state();
+/// let label = move || match session.get() {
+///     AuthSession::Anonymous(_) => "Guest".to_string(),
+///     AuthSession::Authenticated(user) => user
+///         .display_name
+///         .clone()
+///         .unwrap_or_else(|| user.user_id.clone()),
+/// };
+/// ```
+pub use context::use_auth_state;
+
+/// Signed-in profile memo (`None` while anonymous or still loading).
+///
+/// Use this for display name, email, and roles. Pair with
+/// [`routes::RequireAuthenticated`] so the `None` branch is not the page body.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// use leptos::prelude::*;
+/// use uf_product::use_authenticated_user;
+///
+/// let user = use_authenticated_user();
+/// view! {
+///     <p>{move || {
+///         user.get()
+///             .and_then(|u| u.display_name.clone())
+///             .unwrap_or_else(|| "signed out".to_string())
+///     }}</p>
+/// }
+/// ```
+pub use context::use_authenticated_user;
 pub use models::auth::{AnonymousUser, AuthSession, AuthenticatedUser};
 pub use routes::{provide_access_gate_state, use_access_gate_active, AccessGateActive};
 

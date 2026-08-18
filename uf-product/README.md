@@ -16,18 +16,34 @@ in the component preview app (`/orbital`).
 
 ## Quick start
 
+Provide context once, hydrate it, then read the profile (or match `AuthSession` for guest vs signed-in):
+
 ```rust,ignore
 use leptos::prelude::*;
 use uf_product::{
-    init_auth_resource, provide_auth_context, use_authenticated_user,
-    routes::RequireAuthenticated,
+    init_auth_resource, provide_auth_context, use_auth_state, use_authenticated_user,
+    routes::RequireAuthenticated, AuthSession,
 };
 
 #[component]
 fn AppRoot() -> impl IntoView {
     let auth = provide_auth_context(Default::default());
     let _session = init_auth_resource(&auth);
-    view! { <ProtectedPage /> }
+    view! {
+        <SessionChip />
+        <ProtectedPage />
+    }
+}
+
+#[component]
+fn SessionChip() -> impl IntoView {
+    let session = use_auth_state();
+    view! {
+        <span>{move || match session.get() {
+            AuthSession::Anonymous(_) => "Guest",
+            AuthSession::Authenticated(_) => "Signed in",
+        }}</span>
+    }
 }
 
 #[component]
