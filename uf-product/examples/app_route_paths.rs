@@ -1,6 +1,6 @@
 //! Discover the route prefixes registered by product apps (raw `inventory::submit!`).
 //!
-//! Prefer [`uf_app_registration`](uf_app_registration.rs) when teaching zone apps —
+//! Prefer [`uf_app_registration`](uf_app_registration.rs) when teaching registered product apps —
 //! that example uses `uf_app!`, which is what product crates ship.
 //!
 //! ## Command

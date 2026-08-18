@@ -1,8 +1,7 @@
 //! Shared controller so app-bar auth UI and route gates open the same modal.
 //!
-//! Hosted in `uf-product` so product crates do not depend on a Zone A pin that
-//! may not yet re-export these types. `lepton-shell` and [`crate::routes::RequireAuthenticated`]
-//! bind to the same signals when a controller is provided near the shell root.
+//! `lepton-shell` and [`crate::routes::RequireAuthenticated`] bind to the same
+//! signals when a controller is provided near the shell root.
 
 use leptos::prelude::*;
 

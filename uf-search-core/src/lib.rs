@@ -1,13 +1,10 @@
 //! Leptos-free types for the `/search` command palette: source keys/items shared with the
 //! client, plus (behind `ssr`) the backend provider trait and inventory-based registry.
 //!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | Client DTOs ([`SearchSourceKey`], [`SearchSourceItem`]) | Leptos / UI combobox (`uf-integrations::SearchSourcePicker`) |
-//! | SSR provider trait + inventory registry | `define_search_sources!` macro expansion (`uf-product-macros`) |
-//! | Fan-out query helpers on `SearchSourceRegistry` (`ssr`) | Product re-export surface (`uf-product::search_sources`) |
+//! Client DTOs ([`SearchSourceKey`], [`SearchSourceItem`]) have no SSR-only
+//! dependencies. The Leptos combobox UI lives in `uf-integrations::SearchSourcePicker`.
+//! Macro expansion for `define_search_sources!` is in `uf-product-macros`; app crates
+//! typically import through `uf-product::search_sources`.
 //!
 //! ## Concern → API
 //!

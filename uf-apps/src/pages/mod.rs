@@ -1,3 +1,5 @@
+//! Apps directory pages (`/apps`, `/apps/:app_name`).
+
 pub mod detail;
 pub mod index;
 

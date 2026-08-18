@@ -1,16 +1,9 @@
 //! Permission manifests and contracts used by Orbital applications.
 //!
 //! Apps declare a stable permission surface so UI routes, server functions, and
-//! management tooling share the same names. This module owns the shared shapes;
-//! Gauge evaluation and host credential stores live elsewhere.
-//!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | [`AppPermissionManifest`], [`PermissionDomainSpec`], [`PermissionSpec`] | Runtime allow/deny evaluation (Gauge; fail-closed in [`crate::routes`]) |
-//! | [`PermissionEnum`] / [`AppPermissionManifestProvider`] bridges | Host auth middleware (lepton-auth) |
-//! | Manifest shape consumed by `uf_app!` / derive macros | Permission-management UI |
+//! management tooling share the same names. Manifest shapes are defined here;
+//! Gauge evaluation and host credential stores live elsewhere. Runtime
+//! allow/deny is fail-closed in [`crate::routes`] until Gauge is wired.
 //!
 //! # Concern → API
 //!
@@ -82,6 +75,12 @@
 //!
 //! In most Orbital apps this manifest is generated from `#[derive(UfPermissionManifest)]`
 //! or referenced from `uf_app!`, but the runtime shape is defined here.
+//!
+//! # Runtime checks
+//!
+//! [`crate::routes::RequireAuthenticated`] and `#[server]` permission gates read
+//! these names, but Gauge evaluation is not wired yet: named permission checks
+//! **fail closed** (deny) until the host enables the `permissions` feature path.
 
 /// Convert app-specific permission enums into canonical string names.
 ///

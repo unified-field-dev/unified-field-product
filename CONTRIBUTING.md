@@ -27,7 +27,7 @@ Participation is governed by [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Securit
 
 Workspace `Cargo.toml` sets `missing_docs = "deny"` and
 `broken_intra_doc_links = "allow"`. Several UI crates still carry a narrow
-`#![allow(missing_docs)]` (Leptos props / Zone A re-exports); do not widen those
+`#![allow(missing_docs)]` (Leptos props / design-system re-exports); do not widen those
 allows for ordinary new modules.
 
 Broken-link **denial** is applied only when you pass

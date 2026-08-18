@@ -112,4 +112,7 @@ pub fn AppOverviewProductLinkHelp() -> impl IntoView {
 }
 
 /// Ensure apps help inventory is linked into the host binary.
+///
+/// Empty function body; references every `#[help_spotlight_step]` in this module so
+/// `inventory` submissions are retained. See [`uf_help`] crate docs for the full ladder.
 pub fn ensure_help_steps_linked() {}

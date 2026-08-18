@@ -1,4 +1,10 @@
 //! Typed errors for Help server and service paths.
+//!
+//! Public server functions return [`leptos::prelude::ServerFnError`]. SSR paths map
+//! [`HelpError`] with [`HelpError::into_server_fn_error`], which wraps
+//! [`ServerFnError::ServerError`](leptos::prelude::ServerFnError) and copies only
+//! the [`Display`](std::fmt::Display) string. Clients cannot recover the enum variant
+//! from the wire; match on message text only for diagnostics, not for control flow.
 
 use leptos::prelude::ServerFnError;
 use thiserror::Error;
@@ -43,6 +49,9 @@ pub enum HelpError {
 
 impl HelpError {
     /// Map into a Leptos [`ServerFnError`] for server fn returns.
+    ///
+    /// The variant is flattened to a single server error string; do not assume
+    /// structured deserialization on the client.
     #[must_use]
     pub fn into_server_fn_error(self) -> ServerFnError {
         ServerFnError::ServerError(self.to_string())

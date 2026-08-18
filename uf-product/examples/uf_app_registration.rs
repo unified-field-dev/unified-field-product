@@ -1,7 +1,7 @@
 //! Register a product app with `uf_app!` and prove inventory discovery.
 //!
 //! ## When to use
-//! Prefer this over raw `inventory::submit!` — zone apps use the macro.
+//! Prefer this over raw `inventory::submit!` — product apps use the macro.
 //!
 //! ## Command
 //! ```bash

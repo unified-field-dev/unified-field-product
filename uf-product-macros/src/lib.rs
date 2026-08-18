@@ -1,14 +1,8 @@
 //! Proc macros for Unified Field product apps (registration, server context, search sources).
 //!
 //! Design-system macros (`#[component_doc]`, route extraction) live in `orbital-macros`.
-//!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | `uf_app!`, `#[server]`, permission-manifest derive, `define_search_sources!` | Design-system macros (`orbital-macros`) |
-//! | Compile-time registration shape scanned by codegen | Runtime registry types (`uf-product::routes`, `uf-search-core`) |
-//! | Optional `permission = …` gate attribute on `#[server]` | Gauge-backed permission evaluation at runtime |
+//! Runtime registry types live in `uf-product::routes` and `uf-search-core`.
+//! Gauge-backed permission evaluation at runtime is fail-closed until wired.
 //!
 //! ## Concern → API
 //!

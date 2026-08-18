@@ -4,13 +4,9 @@
 //! invocations, then emits generated Rust source that the host `app` crate's `build.rs`
 //! includes to compose every discovered app's routes into one shell.
 //!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | `build.rs` discovery of `uf_app!` and generated include files | Proc-macro expansion of `uf_app!` (`uf-product-macros`) |
-//! | Dedup by `app_id` (prefer `*-app` packages) and `excluded_packages` | Runtime `AppRegistry` / inventory (`uf-product::routes`) |
-//! | Route import + analytics route-table artifacts | Host `<Routes>` composition and auth gates |
+//! Proc-macro expansion of `uf_app!` lives in `uf-product-macros`. Runtime
+//! `AppRegistry` / inventory is in `uf-product::routes`. Host `<Routes>` composition
+//! and auth gates are host responsibilities.
 //!
 //! ## Concern → API
 //!

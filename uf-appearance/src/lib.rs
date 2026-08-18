@@ -1,13 +1,7 @@
 //! Optional Appearance product offering — desktop app-bar appearance popover.
 //!
-//! Preference storage and Valence services stay in `uf-product` for now.
-//!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | App-bar appearance button / popover | `AppearancePreferences` persistence (`uf-product`) |
-//! | Inventory registration for default utilities | Compact avatar-menu appearance rows (`uf-product`) |
+//! Preference storage and Valence services stay in `uf-product`. Compact avatar-menu
+//! appearance rows also live in `uf-product`.
 //!
 //! ## Concern → API
 //!
@@ -18,7 +12,35 @@
 //!
 //! ## Getting started
 //!
-//! Depend on this crate (or enable `uf-integrations` feature `offering-appearance` / `full`).
+//! Depend on this crate, or enable `uf-integrations` feature `offering-appearance` /
+//! `full` so the default utilities pack picks up the inventory contribution. Call
+//! [`ensure_linked`] once at host startup when the stock app bar should show Appearance.
+//!
+//! ```rust,ignore
+//! use leptos::prelude::*;
+//! use uf_appearance::{ensure_linked, AppBarAppearanceButton};
+//!
+//! // Once at host startup (stock utilities pack):
+//! ensure_linked();
+//!
+//! // Or mount the control yourself:
+//! view! { <AppBarAppearanceButton /> }
+//! ```
+//!
+//! Dark/light toggle writes through `uf_product::app_bar_dark_mode_bind`. The settings
+//! button navigates to `uf_product::paths::USER_APPEARANCE`.
+//!
+//! ## Examples
+//!
+//! | Level | Where | What |
+//! |-------|-------|------|
+//! | Highlight | Getting started above | `ensure_linked` + [`AppBarAppearanceButton`] |
+//! | Mid | `uf-integrations` `offering-appearance` | Default app-bar utilities pack |
+//! | Detailed | `examples/shell-chrome-host` | Full shell with appearance control |
+//!
+//! ```bash
+//! cargo check -p shell-chrome-host --features ssr
+//! ```
 
 #![allow(missing_docs)]
 
@@ -37,6 +59,9 @@ use uf_product::{register_app_bar_utility, AppBarUtilityContribution};
 pub const APP_BAR_UTILITY_ORDER: u8 = 30;
 
 /// Appearance popover for the Unified Field app bar — dark / light mode and settings link.
+///
+/// Call [`ensure_linked`] at startup for the stock utilities pack, or mount this component
+/// directly in custom chrome.
 #[component]
 pub fn AppBarAppearanceButton() -> impl IntoView {
     let navigate = use_navigate();
@@ -88,6 +113,9 @@ inventory::submit! {
 }
 
 /// Ensure this crate's inventory submissions are linked (call from hosts if needed).
+///
+/// Without this call (or `uf-integrations` `offering-appearance` / `full`), the Appearance
+/// control does not appear in the default app-bar utilities pack.
 pub fn ensure_linked() {
     register_app_bar_utility();
 }

@@ -3,13 +3,10 @@
 //! On viewports below [`Breakpoint::Md`], wraps the sticky bar in Orbital
 //! [`HideOnScroll`] so chrome tucks on scroll-down and returns on scroll-up.
 //!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | [`UnifiedFieldAppBar`] chrome composition | Session / appearance preference storage (`uf-product`) |
-//! | [`BreadcrumbLink`], search / utilities slots | Auth menu widget (`lepton_shell::AppBarUserMenu` via [`crate::ShellAuthMenu`]) |
-//! | Default utilities from offering inventory | Help / Apps / Appearance button widgets (`uf-help`, `uf-apps`, `uf-appearance`) |
+//! Session and appearance preference storage live in `uf-product`. The auth menu
+//! widget is supplied by the host via [`crate::ShellAuthMenu`]
+//! (`lepton_shell::AppBarUserMenu`). Help, Apps, and Appearance buttons come
+//! from sibling offering crates when the default utilities pack is enabled.
 //!
 //! # Concern → API
 //!

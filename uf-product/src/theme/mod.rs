@@ -2,14 +2,7 @@
 //!
 //! Light/dark mode, brand source, and seed color live here as client-side types
 //! and helpers. Server load/save for signed-in users is in [`crate::services`].
-//!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | [`AppearancePreferences`], localStorage helpers, brand seed tables | Host auth session loading ([`crate::session`]) |
-//! | Applying prefs to the active Orbital theme | Shell app-bar appearance UI (`uf-integrations`) |
-//! | Per-app brand seed lookup ([`brand_seed_for_app_id`]) | Spectra page-view emit ([`crate::telemetry`]) |
+//! Shell app-bar appearance UI is composed in `uf-integrations`.
 //!
 //! # Concern → API
 //!

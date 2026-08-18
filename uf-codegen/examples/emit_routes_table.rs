@@ -12,7 +12,7 @@
 //! Stdout prints `emit_routes_table: OK` and the generated file contains `sample-beacon`.
 //!
 //! ## Look next
-//! Host `build.rs` in an L5 product app; runtime discovery: `uf-product` `uf_app_registration`.
+//! Host `build.rs` in a product app crate; runtime discovery: `uf-product` `uf_app_registration`.
 
 #![allow(clippy::print_stdout, clippy::unwrap_used, clippy::expect_used)]
 

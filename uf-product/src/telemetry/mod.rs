@@ -2,14 +2,8 @@
 //!
 //! Mount trackers once under the main product router so navigations emit
 //! page-view events and the active theme follows the current app brand seed.
-//!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | [`PageViewTracker`] route → Spectra page-view emit | Spectra topic schema registration ([`crate::spectra_schemas`]) |
-//! | [`AppearanceThemeController`] prefs + route brand → theme | Appearance preference storage ([`crate::theme`], [`crate::services`]) |
-//! | Longest-prefix app resolution ([`resolve_app_for_path`]) | Host Axum / logging sinks |
+//! Spectra topic schema registration lives in [`crate::spectra_schemas`];
+//! appearance preference storage in [`crate::theme`] and [`crate::services`].
 //!
 //! # Concern → API
 //!

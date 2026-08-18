@@ -1,10 +1,10 @@
 # uf-product
 
 Unified Field product overlay for Leptos hosts: session bridge, route guards, app
-registry, appearance preferences, and Zone A design-system re-exports used by
+registry, appearance preferences, and design-system re-exports used by
 official uf-app UIs.
 
-Task index, Owns / Does not own, and Concern → API:
+Task index and API tables:
 `cargo doc -p uf-product --features ssr --open`.
 
 ## Design language
@@ -18,13 +18,28 @@ in the component preview app (`/orbital`).
 
 ```rust,ignore
 use leptos::prelude::*;
-use uf_product::{use_auth_state, routes::RequireAuthenticated};
+use uf_product::{
+    init_auth_resource, provide_auth_context, use_authenticated_user,
+    routes::RequireAuthenticated,
+};
+
+#[component]
+fn AppRoot() -> impl IntoView {
+    let auth = provide_auth_context(Default::default());
+    let _session = init_auth_resource(&auth);
+    view! { <ProtectedPage /> }
+}
 
 #[component]
 fn ProtectedPage() -> impl IntoView {
+    let user = use_authenticated_user();
     view! {
         <RequireAuthenticated>
-            <p>{move || format!("Signed in as {}", use_auth_state().get().is_authenticated())}</p>
+            <p>{move || {
+                user.get()
+                    .and_then(|u| u.display_name.clone())
+                    .unwrap_or_else(|| "you".to_string())
+            }}</p>
         </RequireAuthenticated>
     }
 }

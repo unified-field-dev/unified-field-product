@@ -1,31 +1,56 @@
 # uf-apps
 
-Apps directory for Unified Field product hosts. Lists every app registered via `uf_app!` and shows ownership, goals, and tasks on a detail page.
+Apps directory for Unified Field product hosts. Lists every app registered with
+`uf_app!` on a searchable `/apps` index, and opens a detail page with name,
+description, primary route, and optional repository / docs.rs links.
 
 Routes and types: `cargo doc -p uf-apps --open`.
 
 ## Features
 
-- Index page: searchable grid of registered apps (`AppsIndexPage`)
-- Detail page: overview card with product link and optional GitHub / docs.rs links
-  (`AppDetailPage`)
-- Help spotlights: search + first application card on `/apps`; overview description,
-  source, docs, and product link on `/apps/:app_name` (`help_steps`)
-- App-bar Apps launcher (`AppBarAppsButton` / `AppsLauncher`): centered dialog
-  typeahead over registered apps; select navigates to each app's `route_path`
-- Registers as the `"apps"` app via `uf_app!` at `/apps`
-## Registration
+- **Index** — searchable grid (`AppsIndexPage` / `get_apps_page`)
+- **Detail** — overview card (`AppDetailPage` / `get_app_overview`)
+- **App-bar launcher** — `ensure_app_bar_linked` + `AppBarAppsButton` /
+  `AppsLauncher` (centered dialog typeahead; select navigates to `route_path`)
+- **Self-registration** — this crate is the `"apps"` app at `/apps`
+
+Hosts that use the default product app bar should call `ensure_app_bar_linked()`
+so the Apps control shows up. Routes work without it; the launcher button does not.
+
+## Define an app
 
 ```rust
-// uf-apps/src/lib.rs
+use uf_product_macros::uf_app;
+
 uf_app! {
-    name: "Apps",
-    id: "apps",
-    description: "Apps directory and detail pages",
-    icon: "📱",
+    name: "Sample Beacon",
+    id: "sample-beacon",
+    description: "Teaching app registered with uf_app!",
+    icon: "Cube",
     version: "0.1.0",
-    routes: UfAppsRoutes,
-    route_path: "/apps",
+    routes: SampleBeaconRoutes,
+    route_path: "/sample-beacon",
+}
+```
+
+Inventory smoke:
+
+```bash
+cargo run -p uf-product --example uf_app_registration --features ssr
+```
+
+## Mount
+
+```rust,ignore
+use leptos_router::components::Routes;
+use uf_apps::{ensure_app_bar_linked, UfAppsRoutes};
+
+ensure_app_bar_linked();
+
+view! {
+    <Routes fallback=|| "not found">
+        <UfAppsRoutes />
+    </Routes>
 }
 ```
 
@@ -34,8 +59,7 @@ Routes:
 - `/apps` — index
 - `/apps/:app_name` — detail
 
-Host mounts [`UfAppsRoutes`](src/lib.rs) inside `<Routes>`. Teaching mount:
-[`examples/shell-chrome-host`](../examples/shell-chrome-host/).
+Teaching host: [`examples/shell-chrome-host`](../examples/shell-chrome-host/).
 
 ## Verify
 
@@ -47,6 +71,6 @@ cargo doc -p uf-apps --no-deps
 
 ## Related
 
-- Product overlay / registry contracts: [`uf-product`](../uf-product/)
+- Product overlay / registry: [`uf-product`](../uf-product/)
 - Build-time `uf_app!` discovery: [`uf-codegen`](../uf-codegen/)
 - Signed-in welcome landing: [`uf-welcome`](../uf-welcome/)

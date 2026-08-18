@@ -1,12 +1,7 @@
 //! Aggregate `uf_apps_page_view_log` into welcome-style app shortcuts.
 //!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | Pure ranking / dedupe of page-view rows | Spectra schema registration |
-//! | Querying `uf_apps_page_view_log` via `spectra::Spectra` | Host `provide_context` / backend choice |
-//! | Resolving `app_id` → label/link via [`crate::routes::AppRegistry`] | Welcome card UI (`uf-welcome`) |
+//! Pure ranking and dedupe of page-view rows, queried via `spectra::Spectra`.
+//! Welcome card UI lives in `uf-welcome`.
 //!
 //! # Concern → API
 //!

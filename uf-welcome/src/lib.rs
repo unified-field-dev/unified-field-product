@@ -5,23 +5,30 @@
 //! most-used / popular shortcuts from Spectra page views. Operators with
 //! `WelcomeAdmin` manage featured apps at `/welcome/admin`.
 //!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | Signed-in `/welcome` and `/welcome/admin` | Host session middleware / shell chrome |
-//! | Featured catalog (`WelcomeFeaturedApp`) | Spectra explore UI for visit stats |
-//! | Usage card server fns over page-view telemetry | Emitting page views (`uf-product` `PageViewTracker`) |
+//! Host session middleware and shell chrome live outside this crate. Page-view
+//! emission uses `uf_product::telemetry::PageViewTracker`.
 //!
 //! ## Features
 //!
-//! - **Welcome page** — Featured, Recent, My most used, Popular.
-//! - **Featured admin** — `/welcome/admin` gated by `WelcomeAdmin` (enable `admin-permissions` + Gauge).
-//! - **Registered app** — `uf_app!` id `"welcome"` at `/welcome`.
+//! | Feature | Effect |
+//! |---------|--------|
+//! | `lazy-routes` (default) | WASM-split welcome + admin route views; use [`prefetch_family`] |
+//! | `admin-permissions` | Gauge-backed `WelcomeAdmin` gate on `/welcome/admin` |
+//! | `ssr` / `hydrate` | Server and client Leptos graphs |
+//!
+//! ## Concern → API
+//!
+//! | Concern | API |
+//! |---------|-----|
+//! | Mount welcome + admin | [`UfWelcomeRoutes`] |
+//! | Welcome page | [`WelcomePage`] |
+//! | Featured admin | [`WelcomeAdminPage`], `welcome::featured` (SSR) |
+//! | Permission manifest | [`permissions::WelcomePermission`] |
+//! | Help spotlight inventory | [`ensure_help_linked`] |
 //!
 //! ## Getting started
 //!
-//! Mount [`UfWelcomeRoutes`] inside your host's `<Routes>`, provide `Arc<Spectra>`, and
+//! Mount [`UfWelcomeRoutes`] inside the host `<Routes>`, provide `Arc<Spectra>`, and
 //! mount `uf_product::PageViewTracker` so usage cards receive page-view events.
 //!
 //! ```rust,ignore
@@ -33,6 +40,24 @@
 //!         <UfWelcomeRoutes />
 //!     </Routes>
 //! }
+//! ```
+//!
+//! Enable `admin-permissions` (and Gauge) when `/welcome/admin` should enforce
+//! `WelcomeAdmin`. Without that feature, the admin page still mounts; authorization
+//! follows the host's Gauge wiring and e2e session override (`E2E_WELCOME_ADMIN_SESSION_KEY`
+//! under SSR). Featured service errors use `FeaturedError` (see `welcome/featured`).
+//!
+//! ## Examples
+//!
+//! | Level | Where | What |
+//! |-------|-------|------|
+//! | Highlight | Getting started above | Mount [`UfWelcomeRoutes`] |
+//! | Mid | `welcome/featured` + `admin-permissions` | Featured admin gate + `FeaturedError` |
+//! | Detailed | `examples/shell-chrome-host`, `tests/featured_service_integ.rs` | Shell mount + admin integ |
+//!
+//! ```bash
+//! cargo check -p shell-chrome-host --features ssr
+//! cargo test -p uf-welcome --features ssr --test featured_service_integ
 //! ```
 //!
 //! ## Where to look next

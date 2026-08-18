@@ -1,4 +1,22 @@
 //! SSR app registration metadata and inventory registry.
+//!
+//! Product apps usually register through `uf_app!`, which submits an
+//! [`AppRegistration`] into [`AppRegistry`]. The host still mounts the route tree;
+//! this module only carries discovery metadata (name, slug, route prefix, optional
+//! docs links, optional permission manifest hook).
+//!
+//! # Example
+//!
+//! ```rust,ignore
+//! use uf_product::routes::{AppRegistry, get_all_app_route_paths};
+//!
+//! let apps = AppRegistry::auto_discover();
+//! assert!(!apps.is_empty());
+//! let paths = get_all_app_route_paths();
+//! assert!(paths.iter().any(|p| *p == "/counter"));
+//! ```
+//!
+//! Runnable inventory proof: `cargo run -p uf-product --example uf_app_registration --features ssr`.
 
 /// Registration entry for a single Orbital application.
 ///

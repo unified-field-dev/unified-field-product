@@ -1,11 +1,7 @@
 //! App-bar apps search launcher (Dialog + typeahead).
 //!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | Centered search launcher dialog | App registration / `AppRegistry` |
-//! | Client filter over `get_apps` | Workspace `SearchSourcePicker` |
+//! Opens a centered search dialog over registered apps from `AppRegistry`.
+//! Workspace principal pickers use `uf-integrations::SearchSourcePicker` instead.
 //!
 //! ## Concern → API
 //!

@@ -1,4 +1,9 @@
 //! Apps directory chrome — app-bar Apps control.
+//!
+//! [`ensure_linked`] (re-exported as [`crate::ensure_app_bar_linked`]) registers
+//! the default Apps button in the product app-bar utility strip. Mount
+//! [`crate::UfAppsRoutes`] separately for `/apps` pages; the button only appears
+//! after `ensure_app_bar_linked()`.
 
 use leptos::prelude::*;
 use uf_product::primitives::{Button, ButtonAppearance, Tooltip};
@@ -40,6 +45,9 @@ inventory::submit! {
 }
 
 /// Ensure this crate's inventory submissions are linked (call from hosts if needed).
+///
+/// Registers the app-bar Apps utility ([`AppBarAppsButton`] + [`crate::apps_launcher::AppsLauncher`]).
+/// Does not mount [`crate::UfAppsRoutes`]; add those routes in the host router.
 pub fn ensure_linked() {
     register_app_bar_utility();
 }

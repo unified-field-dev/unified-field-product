@@ -2,7 +2,26 @@
 //!
 //! Maps the host axum-login / tower-sessions session into [`AuthSession`] for
 //! reactive UI state. Call [`init_auth_resource`] from the host app root after
-//! [`provide_auth_context`].
+//! [`provide_auth_context`]. UI code should read profiles with
+//! [`crate::use_authenticated_user`] (display name, email, roles), not treat
+//! `AuthSession::is_authenticated()` as a user label.
+//!
+//! # Example
+//!
+//! ```rust,ignore
+//! use leptos::prelude::*;
+//! use uf_product::{init_auth_resource, provide_auth_context, use_authenticated_user};
+//!
+//! #[component]
+//! fn AppRoot() -> impl IntoView {
+//!     let auth = provide_auth_context(Default::default());
+//!     let _session = init_auth_resource(&auth);
+//!     let user = use_authenticated_user();
+//!     view! {
+//!         <p>{move || user.get().and_then(|u| u.display_name.clone()).unwrap_or_default()}</p>
+//!     }
+//! }
+//! ```
 
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;

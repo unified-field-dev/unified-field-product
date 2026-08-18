@@ -5,10 +5,10 @@
 
 [GitHub](https://github.com/unified-field-dev/unified-field-product) · `cargo doc -p uf-product --open` · distributed via git (not crates.io)
 
-Product composition layer for Unified Field Leptos hosts. Hosts (for example
+Product shell APIs for Unified Field Leptos hosts. Hosts (for example
 `lepton-uf-app`) depend on these crates for shell chrome, session/auth gates,
-app registry, workspace search, appearance preferences, and Zone A UI re-exports.
-This repository is not a standalone host binary.
+app registry, workspace search, appearance preferences, and design-system
+primitives. This repository is not a standalone host binary.
 
 ```toml
 [dependencies]
@@ -23,11 +23,11 @@ uf-product = { git = "https://github.com/unified-field-dev/unified-field-product
 - **Shell chrome** — app bar, shell layout, search picker, 404 / coming-soon pages (`uf-integrations`)
 - **Search contracts** — client DTOs and SSR provider registry (`uf-search-core`)
 - **Session and appearance** — host session bridge, light/dark/brand preferences, page-view telemetry (`uf-product`)
-- **Zone A design system** — Orbital primitives/components re-exported from `uf-product` for app crates
+- **Design system** — Orbital primitives and components available through `uf-product` for app crates
 - **Product apps** — signed-in welcome (`uf-welcome`), apps directory (`uf-apps`), component preview (`uf-component-preview`)
 - **Optional offerings** — Help and Appearance app-bar utilities (`uf-help`, `uf-appearance`)
 
-For types and Concern → API tables, open the crate docs:
+For types and task indexes, open the crate docs:
 `cargo doc -p uf-product --features ssr --open` or
 `cargo doc -p uf-integrations --features ssr --open`.
 
@@ -40,7 +40,7 @@ uf-product-macros  (uf_app!, #[server], search/permission macros)
 uf-codegen         (build.rs → route import + analytics tables)
         │
         ▼
-uf-product         (session, guards, registry, appearance, Zone A re-exports)
+uf-product         (session, guards, registry, appearance, design-system APIs)
         │
         ├── uf-search-core      (search DTOs / SSR registry)
         └── uf-integrations     (shell layout, app bar, SearchSourcePicker)
@@ -51,7 +51,7 @@ uf-product         (session, guards, registry, appearance, Zone A re-exports)
 
 | Crate | Role |
 |-------|------|
-| [`uf-product`](uf-product/) | Product overlay: session, routes, permissions, appearance, Zone A re-exports |
+| [`uf-product`](uf-product/) | Product overlay: session, routes, permissions, appearance, design-system APIs |
 | [`uf-integrations`](uf-integrations/) | Shell app bar, layout slots, search picker, 404 / coming-soon |
 | [`uf-search-core`](uf-search-core/) | Leptos-free search keys/items and SSR provider registry |
 | [`uf-product-macros`](uf-product-macros/) | `uf_app!`, `#[server]`, permission derive, `define_search_sources!` |
@@ -79,7 +79,7 @@ fn ProtectedPage() -> impl IntoView {
 }
 ```
 
-Zone apps register with `uf_app!` and appear in the shell after codegen / inventory discovery.
+Product apps register with `uf_app!` and appear in the shell after codegen / inventory discovery.
 
 ## Examples
 
@@ -106,9 +106,9 @@ Workspace default allows broken intra-doc links; primary packages enforce denial
 you set `RUSTDOCFLAGS` as documented there.
 
 CI runs on every push and PR ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
-Layer 1 package fmt / clippy (`-D warnings`) / tests, plus primary `cargo doc` with
+package fmt / clippy (`-D warnings`) / tests, plus primary `cargo doc` with
 broken intra-doc link denial. No root `deny.toml` yet, so deny is not in CI.
-Playwright e2e stays local (Layer 2).
+Playwright e2e stays local.
 
 ```bash
 export CARGO_BUILD_JOBS=1

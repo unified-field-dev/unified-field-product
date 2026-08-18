@@ -9,7 +9,12 @@ use uf_product::primitives::{Flex, FlexAlign, FlexJustify};
 use crate::components::{AppCard, AppSearchInput};
 use crate::server::{get_apps_page, APPS_PAGE_SIZE};
 
-/// Apps directory index: a searchable, paginated grid of every registered app.
+/// Apps directory index: searchable, paginated grid of every registered app.
+///
+/// Wires [`AppSearchInput`] to [`crate::server::get_apps_page`] through
+/// [`uf_product::components::OrbitalInfiniteScroll`]. Re-mounts the scroll
+/// host when the query changes so offset resets. Empty results use
+/// [`uf_product::components::EmptyState`].
 #[component]
 pub fn AppsIndexPage() -> impl IntoView {
     crate::help_steps::ensure_help_steps_linked();

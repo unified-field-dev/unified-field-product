@@ -1,14 +1,10 @@
 //! Product shell layout: Orbital `Layout` plus app-bar / left-nav slots and a
 //! permission toast bus.
 //!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | [`UnifiedFieldShellLayout`] composition | Session loading (`uf-product` `get_session` / `init_auth_resource`) |
-//! | [`ShellAppBar`] / [`ShellLeftNav`] / [`ShellSidebarToggle`] slots | Auth menu widget contents (host via [`crate::provide_shell_auth_menu`]) |
-//! | Permission-denied toast listener mount | Gauge "request permission" navigation (stubbed) |
-//! | Default [`uf_help::HelpTourPlayer`] when `offering-help` | Help step inventory content (app crates) |
+//! Session loading lives in `uf-product` (`get_session` / `init_auth_resource`).
+//! Auth menu contents are host-provided via [`crate::provide_shell_auth_menu`].
+//! Help step inventory content comes from app crates; with `offering-help` this
+//! layout mounts [`uf_help::HelpTourPlayer`] by default.
 //!
 //! # Concern → API
 //!

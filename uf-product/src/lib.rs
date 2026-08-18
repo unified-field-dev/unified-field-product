@@ -1,88 +1,72 @@
 #![recursion_limit = "256"]
-//! # uf-product (Unified Field product package)
+//! # uf-product — Unified Field product shell APIs
 //!
-//! Re-exports Zone A (`orbital-zone-a`) and adds product wiring without lepton UI crates.
-//! Session loading ([`get_session`] / [`init_auth_resource`]) lives here. Hosts compose the
-//! app-bar auth menu via `uf-integrations` `ShellAuthMenu` / `provide_shell_auth_menu`
-//! (typically `lepton_shell::AppBarUserMenu` from `lepton-uf-app`).
+//! Leptos product hosts pull session state, route guards, app registration,
+//! permission manifests, workspace search contracts, appearance preferences,
+//! design-system primitives, and page-view telemetry from this crate.
+//!
+//! At the host root, call [`provide_auth_context`] and [`init_auth_resource`] so
+//! [`get_session`] hydrates [`AuthContext`]. Compose the default app-bar auth menu
+//! through `uf-integrations` (`ShellAuthMenu` / `provide_shell_auth_menu`; usually
+//! `lepton_shell::AppBarUserMenu`). Wrap gated pages in
+//! [`routes::RequireAuthenticated`]. Register each product app with `uf_app!` so
+//! [`routes::AppRegistry`] and `uf-codegen` can discover routes and metadata.
 //!
 //! ## Organized by task
 //!
-//! | Task | Start here |
-//! |------|------------|
-//! | Reactive session / signed-in user | [`AuthContext`], [`use_auth_state`], [`use_authenticated_user`] |
-//! | Load session from host middleware | [`get_session`], [`init_auth_resource`] |
-//! | Auth dialog (sign-in modal) | [`use_auth_dialog_controller`], [`AuthDialogController`] |
-//! | Gate a page behind login | [`routes::RequireAuthenticated`] |
-//! | App registration + route discovery (SSR) | [`routes::AppRegistration`], [`routes::AppRegistry`] |
-//! | Permission manifest shapes | [`permissions`], [`AppPermissionManifest`] |
-//! | Picker / in-page search sources | [`search_sources`] (re-exports `uf-search-core`) |
-//! | Content index / AppBar workspace search | [`workspace_search`] |
-//! | Light/dark/brand appearance | [`theme`], [`services`] |
-//! | Page-view / appearance analytics | [`telemetry`] |
-//! | Zone A design system re-exports | [`components`], [`primitives`], [`models`], [`nav`] |
-//! | Shell chrome (sibling crate) | `uf-integrations` |
+//! | Task | Start here | Example / errors |
+//! |------|------------|------------------|
+//! | Reactive session / signed-in user | [`AuthContext`], [`use_auth_state`], [`use_authenticated_user`] | Getting started below; profile via [`use_authenticated_user`] |
+//! | Load session from host middleware | [`session`], [`get_session`], [`init_auth_resource`] | [`get_session`] # Errors when SSR auth extract fails |
+//! | Auth dialog (sign-in modal) | [`use_auth_dialog_controller`], [`AuthDialogController`] | Shell layout + `provide_shell_auth_menu` |
+//! | Gate a page behind login | [`routes::RequireAuthenticated`] | [`routes`] module example; named permissions fail closed |
+//! | Auth route + return path (no shell dialog) | [`routes::auth_signin_href`], [`routes::auth_signup_href`] | Used when no [`AuthDialogController`] |
+//! | Help skip while a gate is showing | [`provide_access_gate_state`], [`AccessGateActive`] | Pair with [`routes::RequireAuthenticated`] |
+//! | App registration + route discovery (SSR) | [`routes::AppRegistration`], [`routes::AppRegistry`] | `uf_app_registration` example; [`routes`] inventory vs mounted routes |
+//! | Permission manifest shapes | [`permissions`], [`AppPermissionManifest`] | Runnable manifest sample in [`permissions`] |
+//! | Design-system primitives / components | [`components`], [`primitives`], [`models`], [`nav`] | Re-exported from `orbital-zone-a` for one dependency path |
+//! | Picker / in-page search sources | [`search_sources`] | `uf-search-core` registry contracts |
+//! | Content index / AppBar workspace search | [`workspace_search`] | [`workspace_search`] writer + [`workspace_search::WorkspaceSearchError`] |
+//! | Light/dark/brand appearance | [`theme`], [`services`] | [`services`] `save_my_appearance` # Errors |
+//! | Page-view / appearance analytics | [`telemetry`] | [`PageViewTracker`] for `uf_app!` products |
+//! | Shell chrome (sibling crate) | `uf-integrations` | App bar, `WorkspaceSearch`, picker UI |
 //!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | Session bridge, auth dialog control, route guards, permission manifest shapes | Host axum-login middleware / credential stores (lepton-auth) |
-//! | App registration metadata (`AppRegistration` / `AppRegistry`) | Build-time `uf_app!` scanning (`uf-codegen`) and proc-macro expansion (`uf-product-macros`) |
-//! | Search contract re-exports from `uf-search-core` (pickers) | Search combobox UI (`uf-integrations::SearchSourcePicker`) |
-//! | Per-user content index writer/query (`workspace_search`) | AppBar search UI (`uf-integrations::WorkspaceSearch`) |
-//! | Appearance preferences + Zone A design-system re-exports | Shell app bar / layout chrome (`uf-integrations`) |
-//!
-//! ## Features
-//!
-//! - **Zone A design system** — [`components`], [`primitives`], [`context`], [`models`],
-//!   [`nav`], and (behind `preview`/`ssr`/`hydrate`) [`preview`] are re-exported from
-//!   `orbital-zone-a` so downstream apps depend only on `uf-product`.
-//! - **Session bridge** — [`get_session`] / [`init_auth_resource`] map host axum-login
-//!   sessions into [`AuthSession`] (behind `ssr` / `hydrate`).
-//! - **Permissions** — [`permissions`] defines the manifest shapes ([`AppPermissionManifest`]
-//!   and friends) apps use to declare their permission surface.
-//! - **App registration + routing** — [`routes`] provides `AppRegistration`/`AppRegistry`
-//!   (SSR-only, inventory-backed) plus [`routes::RequireAuthenticated`] for gating pages.
-//! - **Search sources (pickers)** — [`search_sources`] re-exports `uf-search-core` for
-//!   in-page pickers (not the AppBar content index).
-//! - **Workspace content index** — [`workspace_search`] maintains per-user
-//!   `UnifiedFieldSearchDocument` rows and owner-scoped query for AppBar search.
-//! - **Appearance + theming** — [`theme`] and [`services`] provide light/dark/brand
-//!   preferences, persisted client-side and (behind `ssr`/`hydrate`) server-backed.
-//! - **Telemetry** — [`telemetry`] tracks page views and appearance changes for analytics.
-//!
-//! ## Concern → API
-//!
-//! | Concern | API |
-//! |---------|-----|
-//! | Reactive session state | [`AuthContext`], [`use_auth_state`], [`use_authenticated_user`] |
-//! | Load session from host middleware | [`get_session`], [`init_auth_resource`] |
-//! | Auth dialog control (sign-in modal, etc.) | [`use_auth_dialog_controller`], [`AuthDialogController`], [`AuthDialogIntent`] |
-//! | Gating a page behind login | [`routes::RequireAuthenticated`] |
-//! | Help skip while a gate is showing | [`provide_access_gate_state`], [`AccessGateActive`] |
-//! | Auth route + return path (no shell dialog) | [`routes::auth_signin_href`], [`routes::auth_signup_href`] |
-//! | Declaring an app's permission surface | [`AppPermissionManifest`], [`PermissionSpec`], [`PermissionDomainSpec`], [`PermissionEnum`] |
-//! | App registration + route discovery (SSR) | [`routes::AppRegistration`], [`routes::AppRegistry`] |
-//! | Design system primitives/components | [`components`], [`primitives`], [`models`], [`nav`] (re-exported from `orbital-zone-a`) |
-//! | Picker combobox contracts | [`search_sources`] (re-exports `uf-search-core`) |
-//! | AppBar content index upsert/query | [`workspace_search`] |
-//! | Light/dark/brand appearance preferences | [`theme`], [`services::{get_my_appearance, save_my_appearance, use_appearance_preferences}`](services) |
-//! | Page-view / appearance-change analytics | [`telemetry`] |
+//! Host axum-login middleware and credential stores live in **lepton-auth**.
+//! Build-time `uf_app!` scanning is **uf-codegen** / **uf-product-macros**.
+//! Shell app bar, layout, and search UI live in **uf-integrations**.
+//! Design-system modules ([`components`], [`primitives`], [`models`], [`nav`],
+//! [`context`], and optionally [`preview`]) are re-exported from `orbital-zone-a`
+//! so app crates can depend on `uf-product` alone for those imports.
 //!
 //! ## Getting started
 //!
-//! Most apps only need the auth/session helpers and a couple of route guards:
+//! Provide auth once near the router root, then gate pages and read the signed-in
+//! profile (not the `is_authenticated()` bool):
 //!
 //! ```rust,ignore
-//! use uf_product::{use_auth_state, routes::RequireAuthenticated};
 //! use leptos::prelude::*;
+//! use uf_product::{
+//!     init_auth_resource, provide_auth_context, use_authenticated_user,
+//!     routes::RequireAuthenticated,
+//! };
+//!
+//! #[component]
+//! fn AppRoot() -> impl IntoView {
+//!     let auth = provide_auth_context(Default::default());
+//!     let _session = init_auth_resource(&auth);
+//!     view! { <ProtectedPage /> }
+//! }
 //!
 //! #[component]
 //! fn ProtectedPage() -> impl IntoView {
+//!     let user = use_authenticated_user();
 //!     view! {
 //!         <RequireAuthenticated>
-//!             <p>{move || format!("Signed in as {}", use_auth_state().get().is_authenticated())}</p>
+//!             <p>{move || {
+//!                 user.get()
+//!                     .and_then(|u| u.display_name.clone())
+//!                     .unwrap_or_else(|| "you".to_string())
+//!             }}</p>
 //!         </RequireAuthenticated>
 //!     }
 //! }
@@ -92,12 +76,13 @@
 //!
 //! | Level | Where | What |
 //! |-------|-------|------|
-//! | Highlight | Getting started above | `RequireAuthenticated` + `use_auth_state` |
-//! | Mid / detailed | workspace `uf-product/examples/` | `uf_app_registration` (`uf_app!`), `app_route_paths`, `auth_shell_host` (Axum gate) |
+//! | Highlight | Getting started above | `init_auth_resource` + `RequireAuthenticated` + `use_authenticated_user` |
+//! | Mid / detailed | workspace `uf-product/examples/` | `uf_app_registration` (`uf_app!`), `app_route_paths`, `auth_shell_host` (Axum inventory gate) |
 //! | Nested UI | workspace `examples/` | `shell-chrome-host`, `component-preview-host` |
 //!
 //! ```bash
 //! cargo run -p uf-product --example uf_app_registration --features ssr
+//! cargo run -p uf-product --example auth_shell_host --features ssr
 //! ```
 //!
 //! ## Where to look next
@@ -107,12 +92,12 @@
 //! - [`routes`] — app registration + route guards.
 //! - `uf-integrations` — shell app bar, `WorkspaceSearch`, and `SearchSourcePicker`.
 //! - [`workspace_search`] — per-user content index (SideEffect/Iter writers + query).
-//! - `uf-search-core` — picker DTOs/registry (re-exported from [`search_sources`]).
+//! - `uf-search-core` — picker DTOs/registry (also via [`search_sources`]).
 //! - `uf-product-macros` / `uf-codegen` — `uf_app!` registration and build-time route discovery.
 
-// Narrow allow: Zone A / Spectra / inventory re-exports and generated SSR modules
-// expand many public items without local rustdoc. Prefer documenting new product-owned
-// APIs at the item; do not widen this allow for ordinary new modules.
+// Narrow allow: design-system / Spectra / inventory re-exports and generated SSR
+// modules expand many public items without local rustdoc. Prefer documenting new
+// product-owned APIs at the item; do not widen this allow for ordinary new modules.
 #![allow(missing_docs)]
 
 pub use orbital_zone_a::context;

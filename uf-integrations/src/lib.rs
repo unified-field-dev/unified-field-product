@@ -3,14 +3,10 @@
 //! via a slot or Leptos context ([`HostAuthMenu`]). Trailing utilities are a generic
 //! children slot (default = optional product offerings via inventory).
 //!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | App bar, shell layout slots, search picker, coming-soon / 404 pages | Session loading and route guards (`uf-product`) |
-//! | Host-provided auth-menu slot wiring | Auth UI widgets (`lepton_shell::AppBarUserMenu`) |
-//! | Default utilities collection from offering inventory | Help / Apps / Appearance widgets (`uf-help`, `uf-apps`, `uf-appearance`) |
-//! | Combobox UI over `uf-search-core` keys/items | Search provider registry / Valence queries (`uf-search-core`) |
+//! Session loading and route guards live in `uf-product`. Auth UI widgets come
+//! from `lepton_shell::AppBarUserMenu`. Help, Apps, and Appearance widgets live
+//! in sibling offering crates. Search provider registry and Valence queries live
+//! in `uf-search-core`.
 //!
 //! ## Features
 //!

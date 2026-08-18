@@ -1,15 +1,10 @@
 //! Multi-source search combobox over `uf-search-core` keys and items.
 //!
-//! Parents own fetching: register providers once (macros / Quark on SSR), then
+//! Parents supply fetching: register providers once (macros / Quark on SSR), then
 //! fill [`SearchSourcePicker`] options from a server fn that calls
-//! `SearchSourceRegistry::query_many`.
-//!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | Combobox UI, grouping, select / search callbacks | Provider registry and Valence queries (`uf-search-core`) |
-//! | Rendering [`SearchSourceItem`] rows | `define_search_sources!` registration (`uf-product-macros`) |
+//! `SearchSourceRegistry::query_many`. Provider registry and Valence queries
+//! live in `uf-search-core`; `define_search_sources!` registration in
+//! `uf-product-macros`.
 //!
 //! # Concern → API
 //!

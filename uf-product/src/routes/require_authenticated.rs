@@ -270,6 +270,9 @@ fn permission_denied_gate(
 ///     </RequireAuthenticated>
 /// }
 /// ```
+///
+/// Named permission gates fail closed until Gauge is wired: only an explicit
+/// allow from the permission check grants access; transport errors deny.
 #[component]
 pub fn RequireAuthenticated(
     /// Whether requires email verification is enabled.

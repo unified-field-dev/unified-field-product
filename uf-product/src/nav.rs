@@ -1,4 +1,4 @@
-//! Navigation helpers: Zone A `nav` re-exports plus product-local history helpers.
+//! Navigation helpers from the design system plus product-local history helpers.
 
 pub use orbital_zone_a::nav::*;
 

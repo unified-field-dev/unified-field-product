@@ -1,16 +1,9 @@
 //! Appearance server fns, context bootstrap, and permission-toast helpers.
 //!
 //! Session loading for auth lives in [`crate::session`] (`get_session` /
-//! `init_auth_resource`). Host credential stores stay in lepton-auth.
-//! Preference *types* and localStorage helpers live in [`crate::theme`].
-//!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | [`get_my_appearance`] / [`save_my_appearance`] server fns | Preference type definitions ([`crate::theme`]) |
-//! | [`provide_appearance_context`] / [`init_appearance_resource`] | Shell appearance menu UI (`uf-integrations`) |
-//! | Permission-denied toast bus ([`permission_server_errors`]) | Gauge permission evaluation (fail-closed stub in [`crate::routes`]) |
+//! `init_auth_resource`); host credential stores stay in lepton-auth.
+//! Preference types and localStorage helpers live in [`crate::theme`].
+//! Shell appearance menu UI is composed in `uf-integrations`.
 //!
 //! # Concern → API
 //!
@@ -36,6 +29,12 @@
 //! // After the user picks dark mode:
 //! let _ = save_my_appearance("dark".into(), "product".into(), None);
 //! ```
+//!
+//! # Errors
+//!
+//! [`get_my_appearance`] and [`save_my_appearance`] return [`leptos::prelude::ServerFnError`]
+//! when the caller is not authenticated, Higgs/Valence setup fails, or persistence
+//! rejects the payload (for example a malformed brand seed color).
 
 pub mod appearance_service;
 pub mod permission_server_errors;

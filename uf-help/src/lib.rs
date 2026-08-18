@@ -1,45 +1,112 @@
 //! Optional Help product offering for Unified Field shells.
 //!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | App-bar Help menu (report + replay) | Help center CMS / markdown routes |
-//! | Spotlight tour inventory + player | Orbital spotlight primitives |
-//! | Visit progress (Valence + localStorage) | Platform anon identity claim |
-//! | GitHub feedback bot (issues / private vuln) | Neutrino secret store implementation |
+//! Ships the app-bar Help menu (bug / feature / security reports and replay),
+//! a spotlight tour player backed by compile-time step inventory, visit progress
+//! in Valence plus a signed-out `localStorage` mirror, and a GitHub feedback bot.
+//! Help center CMS routes, Orbital spotlight primitives, platform anon identity
+//! claims, and Neutrino secret wiring live in other crates.
 //!
 //! ## Concern → API
 //!
 //! | Concern | API |
 //! |---------|-----|
+//! | Author a step (macro + DOM anchor) | [`help_spotlight_step`], `spotlight = "…"` matches element `id` |
+//! | Link inventory into the host binary | App crate `ensure_help_steps_linked()`; [`ensure_linked`] for uf-help's own submissions |
+//! | Mount the tour player | [`HelpTourPlayer`] via `uf-integrations` feature `offering-help` / `full` on `UnifiedFieldShellLayout` |
+//! | Collect steps for a pathname | [`collect_help_steps_for_route`], [`HelpStepDescriptor`] |
+//! | Match inventory `route` to pathname | [`route_matches`] (exact; plus `"/apps/:app_name"`) |
+//! | Pending / seen semantics | [`compute_pending`], stable [`HelpStepDescriptor::feature_highlight`] keys |
+//! | Signed-in visit rows | [`help_list_visits_for_route`], [`help_mark_steps_seen`], [`help_request_replay_for_route`] |
+//! | Signed-out mirror + merge | [`LOCAL_STORAGE_KEY`], [`read_local_visits`], [`merge_local_into_server`] |
+//! | Replay on current route only | [`request_replay_current_route`], [`notify_help_replay`], Help menu replay |
+//! | Skip tour during auth gates | [`HelpTourPlayer`] + [`uf_product::AccessGateActive`] |
 //! | App-bar Help control | [`AppBarHelpButton`] |
-//! | Default tour player | [`HelpTourPlayer`] |
-//! | Author a step | [`help_spotlight_step`] via `uf-help-macros` |
-//! | Collect inventory | [`collect_help_steps`], [`collect_help_steps_for_route`], [`HelpStepDescriptor`] |
-//! | Match a pathname to a step `route` | [`route_matches`] (exact, plus `"/apps/:app_name"`) |
-//! | Visits / pending | [`service`], [`server`] |
-//! | Reports | [`report`], [`submit_help_bug_report`], … |
-//! | Link inventory into the host | [`ensure_linked`] |
+//! | Report dialogs + GitHub submit | [`HelpReportDialog`], [`submit_help_bug_report`], … |
+//! | Typed failures | [`HelpError`], [`HelpError::into_server_fn_error`] |
 //!
-//! ## Features
+//! ## Authoring ladder
 //!
-//! - **Incremental highlights** — progress is per `feature_highlight`. A later
-//!   release that adds a new key shows that step to returning users; already-seen
-//!   steps stay quiet until Help → Replay spotlight tour (current route only).
-//! - **AdaptiveMenu Help** — Bug, Feature, Security, Replay (popover ≥ Md, drawer below).
-//! - **Repository from `uf_app!`** — deep links and the GitHub bot target
-//!   `AppRegistration.repository` for the active route.
-//! - **Route matching** — step `route` is exact pathname equality, except
-//!   `"/apps/:app_name"` which matches a single segment under `/apps` (visits store
-//!   that pattern, not the slug).
-//! - **Access gates** — auto-play stays off while a RequireAuthenticated empty
-//!   state is showing (sign-in, email verification, or permission required).
+//! ### 1. Highlight — register a step and anchor the cutout
+//!
+//! Add a Leptos body with [`help_spotlight_step`] (re-exported from this crate).
+//! When `spotlight` is set, give the target UI the same string as its HTML `id`
+//! (Orbital passes it to `SpotlightTourStep` as `anchor_id`). Omit `spotlight` to center the panel with no cutout.
+//!
+//! ```rust,ignore
+//! use leptos::prelude::*;
+//! use uf_help::help_spotlight_step;
+//!
+//! #[help_spotlight_step(
+//!     route = "/apps",
+//!     feature_highlight = "apps-search",
+//!     title = "Search apps",
+//!     spotlight = "apps-search-input",
+//!     order = 10,
+//! )]
+//! #[component]
+//! pub fn AppsSearchHelp() -> impl IntoView {
+//!     view! {
+//!         <input id="apps-search-input" />
+//!         <p data-testid="help-step-apps-search">"Use search to find apps."</p>
+//!     }
+//! }
+//! ```
+//!
+//! Keep `feature_highlight` stable across releases. Renaming a key is a new
+//! highlight: returning users see that step once without replaying older keys on
+//! the same route.
+//!
+//! ### 2. Mid — force-link inventory in the host binary
+//!
+//! Inventory only runs if the step module is linked. Call an empty
+//! `ensure_help_steps_linked()` from the app crate (see `uf_apps::ensure_help_linked`)
+//! at startup or from a route entry point so `inventory` submissions are retained.
+//!
+//! ```rust,ignore
+//! uf_apps::ensure_help_linked();
+//! uf_welcome::ensure_help_linked();
+//! ```
+//!
+//! Hosts that define their own steps use the same pattern in `help_steps.rs`.
+//!
+//! ### 3. Mount — enable `offering-help` and use the stock shell
+//!
+//! Depend on `uf-integrations` with feature `offering-help` (or `full`). The default
+//! `UnifiedFieldShellLayout` mounts [`HelpTourPlayer`] beside page chrome; call [`ensure_linked`] once if you rely
+//! on uf-help's app-bar utility registration.
+//!
+//! ### 4. Runtime — matching, progress, replay
+//!
+//! - **Route matching** — step `route` is exact pathname equality except
+//!   `"/apps/:app_name"`, which matches `/apps/{slug}` (one segment). Valence rows
+//!   store the inventory pattern, not the live slug ([`inventory_route_keys_for_pathname`]).
+//! - **Pending** — no visit row, or visit with `replay == true` ([`compute_pending`]).
+//! - **Signed-out** — progress lives under [`LOCAL_STORAGE_KEY`]; on first signed-in
+//!   write, [`help_mark_steps_seen`] merges missing local rows into Valence
+//!   ([`merge_local_into_server`] on read keeps local-only rows visible until then).
+//! - **Replay** — Help → Replay spotlight tour sets replay for the **current route
+//!   only** ([`help_request_replay_for_route`] / [`local_request_replay_for_route`]).
+//!
+//! Server failures map through [`HelpError::into_server_fn_error`]: callers receive
+//! [`ServerFnError::ServerError`](leptos::prelude::ServerFnError) with the
+//! [`Display`](std::fmt::Display) message only (no structured variant on the wire).
+//! See [`mod@error`] and [`mod@server`] `# Errors` sections.
+//!
+//! ## Examples
+//!
+//! | Example | What it shows |
+//! |---------|---------------|
+//! | `examples/shell-chrome-host/` | Shell layout with default offerings; `cargo check -p shell-chrome-host --features ssr` |
+//! | `uf-product-ui-e2e/end2end/tests/help_spotlight.spec.ts` | Once (anon/authed), replay current route, access-gate skip, apps/welcome steps |
+//! | `uf-apps` `help_steps.rs` | Seeded `/apps` steps + `uf_apps::ensure_help_linked` |
+//! | `uf-notifications` `help_steps.rs` | Bell / inbox steps on `/notifications` (link inventory the same way) |
 //!
 //! ## Getting started
 //!
-//! Depend on this crate (or enable `uf-integrations` feature `offering-help` /
-//! `full`). The stock shell mounts [`HelpTourPlayer`] when `offering-help` is on.
+//! ```bash
+//! cargo doc -p uf-help --features ssr --open
+//! cargo check -p uf-help --features ssr
+//! ```
 
 #![allow(missing_docs)]
 

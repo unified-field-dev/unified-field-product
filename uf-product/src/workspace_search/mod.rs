@@ -1,14 +1,11 @@
 //! Per-user workspace **content index** (AppBar search) — not picker search sources.
 //!
-//! ## Owns / Does not own
+//! Stores index rows, provides a writer and owner-scoped query on SSR, and
+//! exposes [`query_workspace_search`] for the AppBar UI in `uf-integrations`.
+//! Picker registry contracts live in [`crate::search_sources`] / `uf-search-core`.
 //!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | Index rows, writer, owner-scoped query (SSR) | Picker registry (`crate::search_sources` / `uf-search-core`) |
-//! | Indexing policy + relative `link` validation | AppBar UI (`uf-integrations::WorkspaceSearch`) |
-//! | Actor guard on [`query`] (User only) | Host Chronon / Boson scheduling for iters |
-//! | Teaching stub [`demo`] (IndexedDemoItem SE/Iter) | Production L3 app source models |
-//! | [`query_workspace_search`] server fn + [`WorkspaceSearchHit`] DTO | — |
+//! The teaching stub [`demo`] demonstrates IndexedDemoItem SE/Iter patterns;
+//! production app source models register their own SideEffect / iters entries.
 //!
 //! ## Integrating a source model
 //!
@@ -36,6 +33,24 @@
 //! | Errors | [`WorkspaceSearchError`] |
 //! | TTL window | [`SEARCH_DOCUMENT_TTL_SECS`] |
 //! | Teaching SE / Iter | [`demo`] |
+//!
+//! # Example
+//!
+//! Build a [`SearchDocumentDraft`] and upsert through [`SearchDocumentWriter`]
+//! (see [`demo::IndexedDemoIndexer`] for SideEffect / Iter wiring), then query:
+//!
+//! ```rust,ignore
+//! use uf_product::workspace_search::{query, SearchDocumentWriter, WorkspaceSearchHit};
+//! // let draft: SearchDocumentDraft = /* user, app_id, source_table, title, link, … */;
+//! // SearchDocumentWriter::upsert(&valence, draft).await?;
+//! let hits: Vec<WorkspaceSearchHit> = query(&valence, "title", 10).await?;
+//! ```
+//!
+//! # Errors
+//!
+//! [`WorkspaceSearchError`] covers unauthenticated callers, invalid actors,
+//! rejected query/link text, and Valence persistence failures. The AppBar server
+//! fn [`query_workspace_search`] maps these to [`leptos::prelude::ServerFnError`].
 
 mod dto;
 #[cfg(any(feature = "ssr", feature = "hydrate"))]

@@ -1,11 +1,8 @@
 //! Registry-driven preview navigation and routing helpers.
 //!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | Merging Orbital + local preview registrations | Leaf component implementations (Orbital crates) |
-//! | Catalog shell, nav, search, and slug page | Product shell layout (`uf-integrations`) |
+//! Merges Orbital and local preview registrations into a catalog shell with
+//! nav, search, and slug-routed preview pages. Leaf component implementations
+//! live in Orbital crates; product shell layout in `uf-integrations`.
 //!
 //! # Concern → API
 //!

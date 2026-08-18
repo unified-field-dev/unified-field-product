@@ -1,3 +1,27 @@
+//! Server functions and pure helpers for the apps directory.
+//!
+//! Data comes from the in-memory [`uf_product::AppRegistry`] (public registration
+//! metadata only — no Valence reads, no permission gate). [`get_apps_page`] and
+//! [`get_app_overview`] are the endpoints [`AppsIndexPage`] and [`AppDetailPage`]
+//! call.
+//!
+//! ## Search / filter
+//!
+//! [`filter_apps_by_query`] mirrors the index search box. [`page_apps`] applies
+//! the orbital over-fetch slice. Unit tests in this module cover happy and sad
+//! paths for sort, filter, lookup, and pagination.
+//!
+//! ## Failure modes
+//!
+//! | Function | `Ok` shapes | `Err(ServerFnError)` |
+//! |----------|-------------|----------------------|
+//! | [`get_apps_page`] | [`Page<AppDirectoryItem>`] (possibly empty) | SSR / transport failure |
+//! | [`get_app_overview`] | `Some(AppOverview)` or `None` for unknown slug | SSR / transport failure |
+//! | [`get_apps`] (legacy) | `Vec<AppDirectoryItem>` | SSR / transport failure |
+//!
+//! Unknown slugs and empty registries are not errors. [`find_app_overview`] returns
+//! `None` when the slug is missing.
+
 use leptos::prelude::*;
 use orbital_paging::Page;
 use serde::{Deserialize, Serialize};
@@ -141,10 +165,15 @@ pub async fn get_apps() -> Result<Vec<AppDirectoryItem>, ServerFnError> {
 /// Paginated apps endpoint.
 ///
 /// Returns a [`Page<AppDirectoryItem>`] using the standard `orbital-paging`
-/// over-fetch pattern.  Apps come from the in-memory registry so we fetch
-/// all, sort, filter by optional search query, then slice.
+/// over-fetch pattern. Apps come from the in-memory registry: fetch all,
+/// sort by name, filter by optional search query, then slice.
 ///
 /// **Public by design:** registry metadata only; no permission gate required.
+///
+/// # Errors
+///
+/// Returns [`ServerFnError`] when the server-fn transport or SSR extractor fails.
+/// An empty registry or a filter with no matches still returns `Ok` with zero items.
 #[uf_product_macros::server]
 pub async fn get_apps_page(
     /// Zero-based index of the first app to return.
@@ -165,6 +194,11 @@ pub async fn get_apps_page(
 /// is registered.
 ///
 /// **Public by design:** registry metadata only; no permission gate required.
+///
+/// # Errors
+///
+/// Returns [`ServerFnError`] when the server-fn transport or SSR extractor fails.
+/// An unknown slug returns `Ok(None)`, not an error.
 #[uf_product_macros::server]
 pub async fn get_app_overview(
     /// App id/slug to look up.

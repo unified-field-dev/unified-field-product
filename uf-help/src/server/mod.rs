@@ -1,4 +1,9 @@
 //! Higgs server functions for Help visits, repository lookup, and report submit.
+//!
+//! All public `Result<_, ServerFnError>` functions validate inputs where noted,
+//! then map [`crate::HelpError`] through [`HelpError::into_server_fn_error`]
+//! (message string only on the client). Without the `ssr` feature, each call
+//! returns `ServerFnError` with message `"SSR required"`.
 
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -38,7 +43,10 @@ fn validate_highlight(feature_highlight: &str) -> Result<(), crate::HelpError> {
 ///
 /// # Errors
 ///
-/// Returns [`HelpError::Unauthenticated`] when there is no session, or storage errors.
+/// - [`HelpError::InvalidRoute`] when `route` is empty or longer than 512 bytes.
+/// - [`HelpError::Unauthenticated`] when there is no session.
+/// - [`HelpError::Storage`] on Valence I/O failure.
+/// - `"SSR required"` when this crate is built without the `ssr` feature.
 #[uf_product_macros::server]
 pub async fn help_list_visits_for_route(
     route: String,
@@ -59,7 +67,11 @@ pub async fn help_list_visits_for_route(
 
 /// Pending inventory steps for `route` for the signed-in user.
 ///
-/// Anonymous clients should use local storage + `compute_pending` instead.
+/// Anonymous clients should use local storage + [`crate::compute_pending`] instead.
+///
+/// # Errors
+///
+/// Same validation and session/storage failures as [`help_list_visits_for_route`].
 #[uf_product_macros::server]
 pub async fn help_pending_steps_for_route(
     route: String,
@@ -90,6 +102,13 @@ pub async fn help_pending_steps_for_route(
 /// Mark steps seen (`replay = false`) for the signed-in user.
 ///
 /// Also merges any provided `local_visits` that are missing server-side.
+///
+/// # Errors
+///
+/// - [`HelpError::InvalidRoute`] / [`HelpError::InvalidHighlight`] per step key.
+/// - [`HelpError::Unauthenticated`] when there is no session.
+/// - [`HelpError::Storage`] on Valence upsert failure.
+/// - `"SSR required"` without the `ssr` feature.
 #[uf_product_macros::server]
 pub async fn help_mark_steps_seen(
     steps: Vec<HelpStepKey>,
@@ -113,6 +132,13 @@ pub async fn help_mark_steps_seen(
 }
 
 /// Set `replay = true` for visit rows on `route` only (signed-in).
+///
+/// # Errors
+///
+/// - [`HelpError::InvalidRoute`] when `route` fails validation.
+/// - [`HelpError::Unauthenticated`] when there is no session.
+/// - [`HelpError::Storage`] on Valence read/write failure.
+/// - `"SSR required"` without the `ssr` feature.
 #[uf_product_macros::server]
 pub async fn help_request_replay_for_route(route: String) -> Result<(), ServerFnError> {
     validate_route(&route)?;
@@ -130,6 +156,11 @@ pub async fn help_request_replay_for_route(route: String) -> Result<(), ServerFn
 }
 
 /// Resolve `AppRegistration.repository` for the given route on the server.
+///
+/// # Errors
+///
+/// - [`HelpError::InvalidRoute`] when `route` fails validation.
+/// - `"SSR required"` without the `ssr` feature.
 #[uf_product_macros::server]
 pub async fn help_repository_for_route(route: String) -> Result<Option<String>, ServerFnError> {
     validate_route(&route)?;
@@ -145,6 +176,14 @@ pub async fn help_repository_for_route(route: String) -> Result<Option<String>, 
 }
 
 /// Submit a bug report via the GitHub issues bot.
+///
+/// # Errors
+///
+/// - [`HelpError::Validation`] for empty or oversized fields.
+/// - [`HelpError::RateLimited`] when the host throttle fires.
+/// - [`HelpError::Misconfigured`] when the route has no parseable GitHub repository.
+/// - [`HelpError::GitHubUpstream`] on GitHub API failure.
+/// - `"SSR required"` without the `ssr` feature.
 #[allow(clippy::too_many_arguments)]
 #[uf_product_macros::server]
 pub async fn submit_help_bug_report(
@@ -194,6 +233,11 @@ pub async fn submit_help_bug_report(
 }
 
 /// Submit a feature request via the GitHub issues bot.
+///
+/// # Errors
+///
+/// Same failure classes as [`submit_help_bug_report`] (validation, rate limit,
+/// misconfigured repository, GitHub upstream, SSR gate).
 #[uf_product_macros::server]
 pub async fn submit_help_feature_request(
     route: String,
@@ -226,6 +270,11 @@ pub async fn submit_help_feature_request(
 }
 
 /// Submit a security report via the private vulnerability channel (never public issues).
+///
+/// # Errors
+///
+/// Same failure classes as [`submit_help_bug_report`] (validation, rate limit,
+/// misconfigured repository, GitHub upstream, SSR gate).
 #[uf_product_macros::server]
 pub async fn submit_help_security_report(
     route: String,

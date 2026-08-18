@@ -1,4 +1,4 @@
-//! Preview fixtures for Zone B integration components.
+//! Preview fixtures for shell integration components (`uf-integrations`).
 
 mod search_source_picker;
 

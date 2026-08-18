@@ -1,19 +1,12 @@
 //! Route registration, redirect hygiene, and auth-aware route guards.
 //!
-//! Orbital splits routing into two layers:
+//! Apps register metadata through `AppRegistration` and the inventory-backed
+//! `AppRegistry` on SSR builds. Runtime UI gates such as [`RequireAuthenticated`]
+//! protect pages that need sign-in, verified email, or a specific permission.
 //!
-//! - App metadata registration through `AppRegistration` and the inventory-backed
-//!   `AppRegistry` on SSR builds.
-//! - Runtime UI guards such as [`RequireAuthenticated`] for pages that need
-//!   sign-in, verified email, or a specific permission.
-//!
-//! # Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | [`RequireAuthenticated`] gate UI and redirect hygiene | Host axum-login middleware (lepton-auth) |
-//! | SSR `AppRegistration` / `AppRegistry` discovery | `uf_app!` expansion (`uf-product-macros`) and build-time scan (`uf-codegen`) |
-//! | Safe `referer` parsing for post-auth redirects | Shell chrome / left nav (`uf-integrations`) |
+//! Host axum-login middleware lives in lepton-auth. Shell chrome and left nav
+//! are composed in `uf-integrations`. Macro expansion (`uf-product-macros`) and
+//! build-time scan (`uf-codegen`) feed registration into this module.
 //!
 //! Named permission checks currently fail closed (Gauge not wired yet).
 //!
@@ -43,20 +36,37 @@
 //! }
 //! ```
 //!
-//! SSR registration (becomes an [`AppRegistration`] in [`AppRegistry`]):
+//! Full `uf_app!` registration (inventory + codegen route import when `routes:` is set):
 //!
 //! ```rust,ignore
-//! uf_product_macros::uf_app! {
-//!     id: "counter",
+//! use leptos::prelude::*;
+//! use leptos_router::components::{ParentRoute, Route};
+//! use leptos_router::path;
+//! use uf_product_macros::uf_app;
+//!
+//! #[component(transparent)]
+//! fn CounterRoutes() -> impl leptos_router::MatchNestedRoutes + Clone {
+//!     view! {
+//!         <ParentRoute path=path!("counter") view=|| view! { <p>"Counter"</p> }>
+//!             <Route path=path!("") view=|| view! { <p>"ok"</p> } />
+//!         </ParentRoute>
+//!     }
+//!     .into_inner()
+//! }
+//!
+//! uf_app! {
 //!     name: "Counter",
+//!     id: "counter",
 //!     description: "Realtime shared counter example",
 //!     icon: "NumberSymbolSquare24Regular",
-//!     route_path: "/counter"
+//!     version: "0.1.0",
+//!     routes: CounterRoutes,
+//!     route_path: "/counter",
 //! }
 //! ```
 //!
-//! Mid / detailed: `uf-product/examples/uf_app_registration`, `app_route_paths`,
-//! `auth_shell_host`.
+//! Inventory-only smoke (no Leptos mount): `cargo run -p uf-product --example uf_app_registration --features ssr`.
+//! Route path listing: `app_route_paths`. Axum middleware gate: `auth_shell_host`.
 
 mod access_gate;
 mod referer;

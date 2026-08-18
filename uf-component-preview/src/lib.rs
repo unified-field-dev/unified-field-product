@@ -9,26 +9,9 @@
 //! the live `/orbital` app (see `examples/component-preview-host`); rustdoc indexes
 //! the mount APIs integrators call.
 //!
-//! ## Owns / Does not own
-//!
-//! | Owns | Does not own |
-//! |------|----------------|
-//! | `/orbital` route tree ([`OrbitalComponentRoutes`]) and catalog shell | Shipped product app chrome (`uf-integrations`) |
-//! | Registry merge + slug-routed preview pages | Design-system component implementations (Orbital / Zone A) |
-//! | Preview-only layout placeholders and fixtures | Host auth, session, or search production wiring |
-//!
-//! ## Features
-//!
-//! - **Registry-driven catalog** — [`preview::collect_preview_registrations`] merges
-//!   static registrations from every Orbital preview-enabled crate plus this crate's
-//!   own [`preview::fixtures`] and hand-written pages; [`preview::PreviewSlugPage`]
-//!   renders whichever registration matches the current route.
-//! - **Catalog shell** — [`preview::PreviewCatalogShell`], [`preview::PreviewCatalogNav`],
-//!   and [`preview::PreviewCatalogSearch`] provide the AppBar/sidebar/search chrome.
-//! - **Layout examples** — [`components::layouts`] holds preview-only placeholder
-//!   layout compositions (calendar, chat, files, plugin settings, activity feed).
-//! - **Registered app** — this crate registers itself as the `"orbital"` Orbital app
-//!   via `uf_app!`, mounted at `/orbital`.
+//! Shipped product app chrome, host auth, session, and search production wiring
+//! live outside this crate. Design-system component implementations come from
+//! Orbital leaf crates.
 //!
 //! ## Concern → API
 //!
@@ -39,6 +22,18 @@
 //! | Render a slug from the registry | [`preview::PreviewSlugPage`] |
 //! | Catalog chrome (nav / search / shell) | [`preview::PreviewCatalogShell`], [`preview::PreviewCatalogNav`], [`preview::PreviewCatalogSearch`] |
 //! | Prefetch a component family | [`prefetch_family`] |
+//!
+//! ## Features
+//!
+//! | Feature | Effect |
+//! |---------|--------|
+//! | `preview` | Marks this crate as a preview consumer of Orbital / uf-product preview APIs. |
+//! | `record-history` | Pulls `record-history-leptos` preview registrations into the catalog (SSR graph only). |
+//! | `tag-catalog` | Pulls `tag-app` preview registrations into the catalog (SSR graph only). |
+//! | `hydrate` / `ssr` | Leptos client/server split. Hydrate keeps `record-history` / `tag-catalog` off so Valence/SQLite never enters WASM. |
+//!
+//! Enable `record-history` and `tag-catalog` on the SSR host that builds the catalog
+//! binary (see `examples/component-preview-host`). Leave them off hydrate.
 //!
 //! ## Getting started
 //!
@@ -54,6 +49,18 @@
 //!         <OrbitalComponentRoutes />
 //!     </Routes>
 //! }
+//! ```
+//!
+//! ## Examples
+//!
+//! | Level | Where | What |
+//! |-------|-------|------|
+//! | Highlight | Getting started above | Mount [`OrbitalComponentRoutes`] |
+//! | Mid | [`components::examples`] | Teaching `#[component_doc]` widget (`demo-status-pill`) |
+//! | Detailed | `examples/component-preview-host` | Full `/orbital` host; enable `record-history` / `tag-catalog` on SSR |
+//!
+//! ```bash
+//! cargo check -p component-preview-host --features ssr
 //! ```
 //!
 //! ## Where to look next

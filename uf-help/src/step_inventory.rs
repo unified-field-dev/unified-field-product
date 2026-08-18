@@ -1,4 +1,14 @@
-//! Help step inventory descriptors collected from `#[help_spotlight_step]`.
+//! Help step inventory collected from `#[help_spotlight_step]`.
+//!
+//! Each [`HelpStepDescriptor`] is submitted through the `inventory` crate at link
+//! time. App crates keep steps in a `help_steps` module and expose an empty
+//! `ensure_help_steps_linked()` that references every step component so the linker
+//! retains submissions (see `uf_apps::ensure_help_linked`).
+//!
+//! [`collect_help_steps_for_route`] filters by [`route_matches`]: exact pathname
+//! equality, plus the `"/apps/:app_name"` pattern for single-segment app overview
+//! paths. [`inventory_route_keys_for_pathname`] returns the pattern keys used when
+//! reading or writing Valence visit rows (not the live browser slug).
 
 use leptos::prelude::AnyView;
 use uf_product::primitives::PopoverPosition;
