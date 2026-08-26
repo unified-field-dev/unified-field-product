@@ -6,31 +6,37 @@
 //! Help center CMS routes, Orbital spotlight primitives, platform anon identity
 //! claims, and Neutrino secret wiring live in other crates.
 //!
-//! ## Concern → API
+//! ## Features
 //!
-//! | Concern | API |
-//! |---------|-----|
-//! | Author a step (macro + DOM anchor) | [`help_spotlight_step`], `spotlight = "…"` matches element `id` |
-//! | Link inventory into the host binary | App crate `ensure_help_steps_linked()`; [`ensure_linked`] for uf-help's own submissions |
-//! | Mount the tour player | [`HelpTourPlayer`] via `uf-integrations` feature `offering-help` / `full` on `UnifiedFieldShellLayout` |
-//! | Collect steps for a pathname | [`collect_help_steps_for_route`], [`HelpStepDescriptor`] |
-//! | Match inventory `route` to pathname | [`route_matches`] (exact; plus `"/apps/:app_name"`) |
-//! | Pending / seen semantics | [`compute_pending`], stable [`HelpStepDescriptor::feature_highlight`] keys |
-//! | Signed-in visit rows | [`help_list_visits_for_route`], [`help_mark_steps_seen`], [`help_request_replay_for_route`] |
-//! | Signed-out mirror + merge | [`LOCAL_STORAGE_KEY`], [`read_local_visits`], [`merge_local_into_server`] |
-//! | Replay on current route only | [`request_replay_current_route`], [`notify_help_replay`], Help menu replay |
-//! | Skip tour during auth gates | [`HelpTourPlayer`] + [`uf_product::AccessGateActive`] |
-//! | App-bar Help control | [`AppBarHelpButton`] |
-//! | Report dialogs + GitHub submit | [`HelpReportDialog`], [`submit_help_bug_report`], … |
-//! | Typed failures | [`HelpError`], [`HelpError::into_server_fn_error`] |
+//! - **Spotlight step authoring** — Register Leptos help bodies as inventory steps with
+//!   stable `feature_highlight` keys and optional DOM cutouts. [Get started](#author-a-spotlight-step)
+//! - **Help tour player** — Stock [`HelpTourPlayer`] auto-plays pending spotlight steps
+//!   beside shell chrome when `uf-integrations` feature `offering-help` is enabled.
+//!   [Get started](#mount-tour-player)
+//! - **App-bar Help control** — [`AppBarHelpButton`] opens report dialogs and replay for the current route.
+//! - **Visit progress** — Valence rows when signed in; [`LOCAL_STORAGE_KEY`] mirror when signed out.
+//! - **GitHub feedback bot** — Bug, feature, and security report dialogs submit via [`GitHubFeedbackClient`].
 //!
-//! ## Authoring ladder
+//! ## Getting started
 //!
-//! ### 1. Highlight — register a step and anchor the cutout
+//! ```bash
+//! cargo doc -p uf-help --features ssr --open
+//! cargo check -p uf-help --features ssr
+//! ```
 //!
-//! Add a Leptos body with [`help_spotlight_step`] (re-exported from this crate).
-//! When `spotlight` is set, give the target UI the same string as its HTML `id`
-//! (Orbital passes it to `SpotlightTourStep` as `anchor_id`). Omit `spotlight` to center the panel with no cutout.
+//! Typical integration order: author steps with [`help_spotlight_step`], force-link inventory
+//! in the host binary, then enable `offering-help` on `uf-integrations` so [`HelpTourPlayer`]
+//! mounts automatically.
+//!
+//! ## Author a spotlight step
+//!
+//! [`help_spotlight_step`] registers a Leptos component as a Help tour step via `inventory`.
+//! Each step binds a route pathname, stable [`HelpStepDescriptor::feature_highlight`] key,
+//! optional spotlight DOM `id`, and panel copy. App crates define steps in `help_steps.rs`
+//! modules and call `ensure_help_steps_linked()` so submissions survive linking.
+//!
+//! **Prerequisites:** `uf-help` and `uf-help-macros` in the app crate; target UI element with
+//! matching HTML `id` when `spotlight` is set.
 //!
 //! ```rust,ignore
 //! use leptos::prelude::*;
@@ -50,32 +56,52 @@
 //!         <p data-testid="help-step-apps-search">"Use search to find apps."</p>
 //!     }
 //! }
+//!
+//! /// Call from the app crate so inventory is linked into the host binary.
+//! pub fn ensure_help_steps_linked() {}
 //! ```
 //!
-//! Keep `feature_highlight` stable across releases. Renaming a key is a new
-//! highlight: returning users see that step once without replaying older keys on
-//! the same route.
+//! On success the step appears in [`collect_help_steps_for_route`] for `/apps` and Playwright
+//! can assert `data-testid="help-step-apps-search"`. Keep `feature_highlight` stable across
+//! releases; renaming creates a new highlight key for returning users.
 //!
-//! ### 2. Mid — force-link inventory in the host binary
+//! ## Mount tour player
 //!
-//! Inventory only runs if the step module is linked. Call an empty
-//! `ensure_help_steps_linked()` from the app crate (see `uf_apps::ensure_help_linked`)
-//! at startup or from a route entry point so `inventory` submissions are retained.
+//! [`HelpTourPlayer`] reads inventory for the current pathname, resolves visit rows (Valence
+//! when signed in, local storage when signed out), and opens Orbital spotlight panels for
+//! pending steps. Enable once at host boot by depending on `uf-integrations` with feature
+//! `offering-help` (or `full`); the stock `uf_integrations::UnifiedFieldShellLayout` mounts
+//! [`HelpTourPlayer`] beside page chrome. Call [`ensure_linked`] if you rely on uf-help's
+//! app-bar utility registration.
+//!
+//! **Prerequisites:** `ssr` and/or `hydrate` on `uf-help` and `uf-integrations`; step inventory
+//! force-linked in the host binary; session context from `uf-product` for signed-in visits.
 //!
 //! ```rust,ignore
-//! uf_apps::ensure_help_linked();
-//! uf_welcome::ensure_help_linked();
+//! // Cargo.toml: uf-integrations = { workspace = true, features = ["offering-help"] }
+//! use leptos::prelude::*;
+//! use uf_help::{ensure_linked, HelpTourPlayer};
+//! use uf_integrations::UnifiedFieldShellLayout;
+//!
+//! // Once at host boot, before routed pages mount:
+//! ensure_linked();
+//!
+//! #[component]
+//! fn AppShell(children: Children) -> impl IntoView {
+//!     view! {
+//!         <UnifiedFieldShellLayout>
+//!             <HelpTourPlayer />
+//!             {children()}
+//!         </UnifiedFieldShellLayout>
+//!     }
+//! }
 //! ```
 //!
-//! Hosts that define their own steps use the same pattern in `help_steps.rs`.
+//! On success the shell renders spotlight chrome and pending steps auto-play unless
+//! [`uf_product::AccessGateActive`] suppresses tours during auth gates. Replay from
+//! Help → Replay spotlight tour scopes to the current route only ([`help_request_replay_for_route`]).
 //!
-//! ### 3. Mount — enable `offering-help` and use the stock shell
-//!
-//! Depend on `uf-integrations` with feature `offering-help` (or `full`). The default
-//! `UnifiedFieldShellLayout` mounts [`HelpTourPlayer`] beside page chrome; call [`ensure_linked`] once if you rely
-//! on uf-help's app-bar utility registration.
-//!
-//! ### 4. Runtime — matching, progress, replay
+//! ## Runtime semantics
 //!
 //! - **Route matching** — step `route` is exact pathname equality except
 //!   `"/apps/:app_name"`, which matches `/apps/{slug}` (one segment). Valence rows
@@ -90,7 +116,7 @@
 //! Server failures map through [`HelpError::into_server_fn_error`]: callers receive
 //! [`ServerFnError::ServerError`](leptos::prelude::ServerFnError) with the
 //! [`Display`](std::fmt::Display) message only (no structured variant on the wire).
-//! See [`mod@error`] and [`mod@server`] `# Errors` sections.
+//! See [`HelpError`] and server function `# Errors` sections on [`help_list_visits_for_route`].
 //!
 //! ## Examples
 //!
@@ -101,12 +127,15 @@
 //! | `uf-apps` `help_steps.rs` | Seeded `/apps` steps + `uf_apps::ensure_help_linked` |
 //! | `uf-notifications` `help_steps.rs` | Bell / inbox steps on `/notifications` (link inventory the same way) |
 //!
-//! ## Getting started
+//! ## Where to look next
 //!
-//! ```bash
-//! cargo doc -p uf-help --features ssr --open
-//! cargo check -p uf-help --features ssr
-//! ```
+//! - [`HelpStepDescriptor`] / [`collect_help_steps_for_route`] — inventory collection and route matching.
+//! - [`HelpTourPlayer`] — spotlight player component.
+//! - [`AppBarHelpButton`] — app-bar Help menu and replay trigger.
+//! - [`HelpReportDialog`] — bug / feature / security report UI.
+//! - [`help_list_visits_for_route`], [`help_mark_steps_seen`], [`help_request_replay_for_route`] — server fns.
+//! - `uf-help-macros` — [`help_spotlight_step`] attribute reference.
+//! - `uf-integrations` — `UnifiedFieldShellLayout` and `offering-help` feature flag.
 
 #![allow(missing_docs)]
 #![deny(clippy::missing_errors_doc)]

@@ -1,13 +1,13 @@
 //! Server functions and pure helpers for the apps directory.
 //!
 //! Data comes from the in-memory [`uf_product::AppRegistry`] (public registration
-//! metadata only — no Valence reads, no permission gate). [`get_apps_page`] and
-//! [`get_app_overview`] are the endpoints [`AppsIndexPage`] and [`AppDetailPage`]
-//! call.
+//! metadata only — no Valence reads, no permission gate). [`crate::server::get_apps_page`] and
+//! [`crate::server::get_app_overview`] are the endpoints [`crate::AppsIndexPage`] and
+//! [`crate::AppDetailPage`] call.
 //!
 //! ## Search / filter
 //!
-//! [`filter_apps_by_query`] mirrors the index search box. [`page_apps`] applies
+//! [`crate::server::filter_apps_by_query`] mirrors the index search box. [`crate::server::page_apps`] applies
 //! the orbital over-fetch slice. Unit tests in this module cover happy and sad
 //! paths for sort, filter, lookup, and pagination.
 //!
@@ -15,11 +15,11 @@
 //!
 //! | Function | `Ok` shapes | `Err(ServerFnError)` |
 //! |----------|-------------|----------------------|
-//! | [`get_apps_page`] | [`Page<AppDirectoryItem>`] (possibly empty) | SSR / transport failure |
-//! | [`get_app_overview`] | `Some(AppOverview)` or `None` for unknown slug | SSR / transport failure |
-//! | [`get_apps`] (legacy) | `Vec<AppDirectoryItem>` | SSR / transport failure |
+//! | [`crate::server::get_apps_page`] | [`orbital_paging::Page<AppDirectoryItem>`] (possibly empty) | SSR / transport failure |
+//! | [`crate::server::get_app_overview`] | `Some(AppOverview)` or `None` for unknown slug | SSR / transport failure |
+//! | [`crate::server::get_apps`] (legacy) | `Vec<AppDirectoryItem>` | SSR / transport failure |
 //!
-//! Unknown slugs and empty registries are not errors. [`find_app_overview`] returns
+//! Unknown slugs and empty registries are not errors. [`crate::server::find_app_overview`] returns
 //! `None` when the slug is missing.
 
 use leptos::prelude::*;
@@ -66,7 +66,7 @@ pub fn sort_apps_by_name(apps: &mut [AppDirectoryItem]) {
     apps.sort_by(|a, b| a.name.cmp(&b.name));
 }
 
-/// Case-insensitive name/description filter used by [`get_apps_page`].
+/// Case-insensitive name/description filter used by [`crate::server::get_apps_page`].
 ///
 /// Blank / whitespace-only queries leave `apps` unchanged.
 pub fn filter_apps_by_query(apps: &mut Vec<AppDirectoryItem>, query: Option<&str>) {

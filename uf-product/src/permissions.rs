@@ -71,6 +71,8 @@
 //!         &COUNTER_MANIFEST
 //!     }
 //! }
+//!
+//! assert_eq!(CounterPermissionManifest::manifest().app_id, "counter");
 //! ```
 //!
 //! In most Orbital apps this manifest is generated from `#[derive(UfPermissionManifest)]`

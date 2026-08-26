@@ -1,46 +1,70 @@
 //! Optional Appearance product offering — desktop app-bar appearance popover.
 //!
-//! Preference storage and Valence services stay in `uf-product`. Compact avatar-menu
-//! appearance rows also live in `uf-product`.
+//! Ships [`AppBarAppearanceButton`] for dark/light toggle and a shortcut to user
+//! appearance settings. Preference storage and Valence services stay in `uf-product`;
+//! compact avatar-menu appearance rows also live there.
 //!
-//! ## Concern → API
+//! ## Features
 //!
-//! | Concern | API |
-//! |---------|-----|
-//! | App-bar appearance popover | [`AppBarAppearanceButton`] |
-//! | Link inventory into the host | [`ensure_linked`] |
+//! - **App-bar appearance control** — Popover with dark mode switch and settings link for
+//!   the stock Unified Field app bar. Call [`ensure_linked`] once at host boot to register
+//!   the inventory contribution, or mount [`AppBarAppearanceButton`] in custom chrome.
+//!   [Get started](#getting-started)
 //!
 //! ## Getting started
 //!
-//! Depend on this crate, or enable `uf-integrations` feature `offering-appearance` /
-//! `full` so the default utilities pack picks up the inventory contribution. Call
-//! [`ensure_linked`] once at host startup when the stock app bar should show Appearance.
+//! The Appearance control writes dark mode through [`uf_product::app_bar_dark_mode_bind`] and
+//! navigates to [`uf_product::paths::USER_APPEARANCE`] for full preference editing. Call
+//! [`ensure_linked`] once at host boot before shell chrome renders when you want the stock
+//! app-bar utilities pack to include Appearance.
+//!
+//! **Prerequisites:** `ssr` and/or `hydrate` on this crate and host deps; `uf-product`
+//! app-bar utilities registry. Alternatively enable `uf-integrations` feature
+//! `offering-appearance` or `full` so the default utilities pack links this inventory.
 //!
 //! ```rust,ignore
 //! use leptos::prelude::*;
 //! use uf_appearance::{ensure_linked, AppBarAppearanceButton};
+//! use uf_product::app_bar_dark_mode_bind;
 //!
-//! // Once at host startup (stock utilities pack):
+//! // Once at host boot, before UnifiedFieldShellLayout renders:
 //! ensure_linked();
 //!
-//! // Or mount the control yourself:
-//! view! { <AppBarAppearanceButton /> }
+//! // Or mount the control in custom chrome:
+//! let dark = app_bar_dark_mode_bind();
+//! view! { <AppBarAppearanceButton /> };
+//! assert!(dark.get_untracked(), "dark mode bind is live after mount");
 //! ```
 //!
-//! Dark/light toggle writes through `uf_product::app_bar_dark_mode_bind`. The settings
-//! button navigates to `uf_product::paths::USER_APPEARANCE`.
+//! On success the stock app bar shows the Appearance utility (order
+//! [`APP_BAR_UTILITY_ORDER`]) and the popover toggles dark mode. Runnable reference:
+//! `cargo check -p shell-chrome-host --features ssr`.
+//!
+//! **Failure modes:** Without [`ensure_linked`] (and without `offering-appearance` /
+//! `full`), inventory submissions are not linked and the control never appears in the
+//! default utilities pack. Custom chrome that skips `ensure_linked` must mount
+//! [`AppBarAppearanceButton`] directly.
 //!
 //! ## Examples
 //!
 //! | Level | Where | What |
 //! |-------|-------|------|
-//! | Highlight | Getting started above | `ensure_linked` + [`AppBarAppearanceButton`] |
+//! | Highlight | Getting started above | [`ensure_linked`] + [`AppBarAppearanceButton`] |
 //! | Mid | `uf-integrations` `offering-appearance` | Default app-bar utilities pack |
 //! | Detailed | `examples/shell-chrome-host` | Full shell with appearance control |
 //!
 //! ```bash
 //! cargo check -p shell-chrome-host --features ssr
 //! ```
+//!
+//! ## Where to look next
+//!
+//! - [`AppBarAppearanceButton`] — popover UI and dark-mode switch.
+//! - [`ensure_linked`] — inventory link for the stock utilities pack.
+//! - `uf_product::app_bar_dark_mode_bind` — shared dark-mode signal for the app bar.
+//! - `uf_product::paths::USER_APPEARANCE` — full appearance preferences page.
+//! - `uf-integrations` (`offering-appearance` / `full`) — wires this crate into shell chrome.
+//! - `examples/shell-chrome-host` — teaching host (`cargo check -p shell-chrome-host --features ssr`).
 
 #![allow(missing_docs)]
 

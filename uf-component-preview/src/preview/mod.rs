@@ -8,9 +8,9 @@
 //!
 //! | Concern | API |
 //! |---------|-----|
-//! | Collect all preview registrations | [`collect_preview_registrations`] |
-//! | Route one slug to its preview | [`PreviewSlugPage`], [`preview_page`] |
-//! | Catalog chrome | [`PreviewCatalogShell`], [`PreviewCatalogNav`], [`PreviewCatalogSearch`] |
+//! | Collect all preview registrations | [`collect_preview_registrations`](crate::preview::collect_preview_registrations) |
+//! | Route one slug to its preview | [`PreviewSlugPage`](crate::preview::PreviewSlugPage), [`preview_page`](crate::preview::preview_page) |
+//! | Catalog chrome | [`PreviewCatalogShell`](crate::preview::PreviewCatalogShell), [`PreviewCatalogNav`](crate::preview::PreviewCatalogNav), [`PreviewCatalogSearch`](crate::preview::PreviewCatalogSearch) |
 //!
 //! Teaching path: live `/orbital` via `examples/component-preview-host`.
 

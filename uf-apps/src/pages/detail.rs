@@ -22,7 +22,7 @@ fn title_from_slug(slug: &str) -> String {
 /// App detail page: overview card for a registered product app.
 ///
 /// Reads `app_name` from the router, loads [`crate::server::get_app_overview`],
-/// and renders [`crate::components::AppOverviewCard`]. Unknown slugs show a
+/// and renders the overview card (`AppOverviewCard`). Unknown slugs show a
 /// warning [`uf_product::primitives::MessageBar`]; server-fn failures show an error banner.
 #[component]
 pub fn AppDetailPage() -> impl IntoView {

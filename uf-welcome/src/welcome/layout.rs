@@ -1,4 +1,4 @@
-//! The welcome app's shell layout: app bar plus a router [`Outlet`] for the welcome page.
+//! The welcome app's shell layout: app bar plus a router [`leptos_router::components::Outlet`] for the welcome page.
 
 use leptos::prelude::*;
 use leptos_router::components::Outlet;
@@ -9,7 +9,7 @@ use uf_product::routes::RequireAuthenticated;
 
 use crate::AppMetadata;
 
-/// Welcome app's shell layout: app bar and a router [`Outlet`] for the welcome page.
+/// Welcome app's shell layout: app bar and a router [`leptos_router::components::Outlet`] for the welcome page.
 ///
 /// Auth menu comes from the host via [`uf_integrations::provide_shell_auth_menu`].
 #[component]

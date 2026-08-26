@@ -104,6 +104,16 @@ pub async fn get_my_appearance() -> Result<AppearanceData, ServerFnError> {
 
 /// Persist appearance preferences for the signed-in user.
 ///
+/// # Examples
+///
+/// ```rust,ignore
+/// use uf_product::save_my_appearance;
+///
+/// // In a signed-in settings handler on SSR:
+/// save_my_appearance("dark".into(), "product".into(), None).await?;
+/// assert_eq!("dark", "dark");
+/// ```
+///
 /// # Errors
 ///
 /// Returns [`ServerFnError::Args`] for invalid `color_mode`, `brand_source`, or custom seed

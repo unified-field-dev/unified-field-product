@@ -10,32 +10,86 @@
 //!
 //! ## Features
 //!
+//! - **Shell layout** — [`UnifiedFieldShellLayout`] wraps Orbital's layout with app-bar
+//!   and left-nav slots for product shells. [Get started](#shell-layout)
+//! - **Auth menu slot** — [`provide_shell_auth_menu`] and [`HostAuthMenu`] inject a
+//!   host-provided sign-in menu without hard-depending on auth crates.
+//!   [Get started](#auth-menu-slot)
+//! - **Picker search combobox** — [`SearchSourcePicker`] is a reusable multi-source
+//!   combobox for pickers backed by `uf-search-core` (separate from AppBar content index).
+//!   [Get started](#search-source-picker)
+//! - **AppBar workspace search** — [`WorkspaceSearch`] and [`WorkspaceSearchMobileTrigger`]
+//!   query the per-user workspace content index from the app bar. [Get started](#workspace-search)
 //! - **App bar** — [`UnifiedFieldAppBar`] composes branding, breadcrumbs
-//!   ([`BreadcrumbLink`]), workspace [`WorkspaceSearch`] / compact Dialog, and
-//!   [`AppBarUtilities`] (omit for [`DefaultAppBarUtilities`]).
-//! - **Offerings** — `offering-help`, `offering-apps`, `offering-appearance`, and
-//!   `full` (default) control which product offerings participate in the default
-//!   utilities pack. `offering-apps` is a marker: link `uf-apps` from the host.
-//! - **Shell layout** — [`UnifiedFieldShellLayout`] wraps Orbital's `Layout` with the app
-//!   bar/left-nav slots ([`ShellAppBar`], [`ShellLeftNav`]) and a permission-denied toast bus.
-//! - **Picker search** — [`SearchSourcePicker`] is a reusable, multi-source combobox backed
-//!   by `uf-search-core` (separate from AppBar content index).
-//! - **Workspace content search** — [`WorkspaceSearch`] / [`WorkspaceSearchMobileTrigger`]
-//!   query `uf_product::workspace_search` (per-user index).
+//!   ([`BreadcrumbLink`]), workspace search slots, and [`AppBarUtilities`].
+//! - **Notification bell slot** — [`provide_shell_notification_bell`] and
+//!   [`HostNotificationBell`] mirror the auth-menu slot pattern for alerts.
+//! - **Placeholder pages** — [`UnifiedFieldComingSoonPage`], [`coming_soon_fill_for_path`],
+//!   and [`UnifiedFieldNotFoundPage`] for routes that are not built yet.
 //!
-//! ## Concern → API
+//! ## Shell layout
 //!
-//! | Concern | API |
-//! |---------|-----|
-//! | Branding + breadcrumbs + search + utilities | [`UnifiedFieldAppBar`], [`BreadcrumbLink`], [`AppBarSearchSlot`], [`AppBarUtilities`], [`DefaultAppBarUtilities`] |
-//! | Host auth user menu | [`ShellAuthMenu`] slot, or [`provide_shell_auth_menu`] + [`HostAuthMenu`] |
-//! | Host notification bell | [`provide_shell_notification_bell`] + [`HostNotificationBell`] |
-//! | Top-level shell composition (app bar + left nav + toasts) | [`UnifiedFieldShellLayout`], [`ShellAppBar`], [`ShellLeftNav`], [`ShellSidebarToggle`] |
-//! | Multi-source search combobox (pickers) | [`SearchSourcePicker`] |
-//! | AppBar content-index search | [`WorkspaceSearch`], [`WorkspaceSearchMobileTrigger`], [`AppBarSearchSlot`] |
-//! | Generic "not built yet" / 404 pages | [`UnifiedFieldComingSoonPage`], [`coming_soon_fill_for_path`], [`UnifiedFieldNotFoundPage`] |
+//! [`UnifiedFieldShellLayout`] is the stock product shell wrapper: app bar slot, left nav,
+//! and page body. Use it when you want Orbital chrome with Unified Field app-bar utilities
+//! rather than hand-rolling layout primitives.
+//!
+//! **Prerequisites:** `ssr` and/or `hydrate` on this crate.
+//!
+//! ```rust,ignore
+//! use leptos::prelude::*;
+//! use uf_integrations::{ShellAppBar, UnifiedFieldAppBar, UnifiedFieldShellLayout};
+//!
+//! #[component]
+//! fn AppShell(children: Children) -> impl IntoView {
+//!     view! {
+//!         <UnifiedFieldShellLayout>
+//!             <ShellAppBar slot>
+//!                 <UnifiedFieldAppBar app_name="My App".to_string() />
+//!             </ShellAppBar>
+//!             {children()}
+//!         </UnifiedFieldShellLayout>
+//!     }
+//! }
+//! ```
+//!
+//! On success the host renders [`UnifiedFieldAppBar`] chrome around routed pages.
+//!
+//! ## Auth menu slot
+//!
+//! [`provide_shell_auth_menu`] registers a factory for [`HostAuthMenu`]. Call it **once at
+//! host boot** (before routed pages mount) so [`ShellAuthMenu`] can render your
+//! `lepton_shell::AppBarUserMenu` inside [`UnifiedFieldAppBar`].
+//!
+//! **Prerequisites:** `ssr` and/or `hydrate` on this crate; session context from
+//! `uf-product` when the menu should reflect sign-in state.
+//!
+//! ```rust,ignore
+//! use leptos::prelude::*;
+//! use lepton_shell::AppBarUserMenu;
+//! use uf_integrations::{provide_shell_auth_menu, HostAuthMenu, ShellAuthMenu, UnifiedFieldAppBar};
+//!
+//! // Once at host boot, before routed pages mount:
+//! provide_shell_auth_menu(|| view! { <AppBarUserMenu /> });
+//!
+//! #[component]
+//! fn AppBarWithAuth() -> impl IntoView {
+//!     view! {
+//!         <UnifiedFieldAppBar app_name="My App".to_string()>
+//!             <ShellAuthMenu slot:auth_menu>
+//!                 <HostAuthMenu />
+//!             </ShellAuthMenu>
+//!         </UnifiedFieldAppBar>
+//!     }
+//! }
+//! ```
+//!
+//! On success the app bar shows your `AppBarUserMenu` in the auth slot. Omit
+//! [`provide_shell_auth_menu`] when the host supplies auth chrome another way;
+//! [`HostAuthMenu`] then renders nothing.
 //!
 //! ## Getting started
+//!
+//! Full shell recipe combining layout, auth menu, and optional notification bell:
 //!
 //! ```rust,ignore
 //! use leptos::prelude::*;
@@ -46,7 +100,7 @@
 //! };
 //! use uf_notifications::NotificationBell;
 //!
-//! // At the host root (once):
+//! // Once at host boot, before routed pages mount:
 //! provide_shell_auth_menu(|| view! { <AppBarUserMenu /> });
 //! provide_shell_notification_bell(|| view! { <NotificationBell /> });
 //!
@@ -67,8 +121,82 @@
 //! }
 //! ```
 //!
-//! Mid-level: wire [`SearchSourcePicker`] with keys from `uf-search-core` and fill `options`
-//! from a server fn that calls `SearchSourceRegistry::query_many` (see the picker's `# Examples`).
+//! On success the shell renders [`UnifiedFieldAppBar`] chrome with your
+//! `AppBarUserMenu` in the auth slot. Omit [`ShellAuthMenu`] when the host does
+//! not call [`provide_shell_auth_menu`]; [`HostAuthMenu`] then renders nothing.
+//!
+//! ## Search source picker
+//!
+//! [`SearchSourcePicker`] offers a multi-source combobox for principal and resource
+//! pickers. Parents register search providers once (macros / Quark on SSR), then fill
+//! `options` from a server fn that calls `SearchSourceRegistry::query_many`.
+//!
+//! **Prerequisites:** `uf-search-core` providers registered; `ssr` for server fns.
+//!
+//! ```rust,ignore
+//! use leptos::prelude::*;
+//! use uf_integrations::SearchSourcePicker;
+//! use uf_search_core::{SearchSourceItem, SearchSourceKey};
+//!
+//! #[component]
+//! fn UserPicker() -> impl IntoView {
+//!     let sources = Signal::derive(|| vec![SearchSourceKey::new("users", "Users")]);
+//!     let options = RwSignal::new(Vec::<SearchSourceItem>::new());
+//!     view! {
+//!         <SearchSourcePicker
+//!             search_sources=sources
+//!             options=options.into()
+//!             placeholder="Search users…"
+//!             on_search=Callback::new(move |(keys, q)| {
+//!                 // server fn → SearchSourceRegistry::query_many → options.set(rows)
+//!                 let _ = (keys, q);
+//!             })
+//!             on_select=Callback::new(move |item| { let _ = item; })
+//!         />
+//!     }
+//! }
+//! ```
+//!
+//! Typing in the picker fires `on_search`; updating `options` renders grouped rows in
+//! the combobox. See [`SearchSourcePicker`] `# Examples` for the full callback shape.
+//!
+//! ## Workspace search
+//!
+//! [`WorkspaceSearch`] and [`WorkspaceSearchMobileTrigger`] query the per-user workspace
+//! content index maintained by `uf_product::workspace_search`. Use them in the app bar
+//! (not in standalone pickers—that is [`SearchSourcePicker`]).
+//!
+//! **Prerequisites:** signed-in session from `uf-product`; indexed content via
+//! `SideEffect` writers in source models.
+//!
+//! ```rust,ignore
+//! use leptos::prelude::*;
+//! use uf_integrations::{WorkspaceSearch, WorkspaceSearchMobileTrigger};
+//!
+//! #[component]
+//! fn AppBarSearch() -> impl IntoView {
+//!     view! {
+//!         <WorkspaceSearch />
+//!         <WorkspaceSearchMobileTrigger />
+//!     }
+//! }
+//! ```
+//!
+//! When a signed-in user types a query, the desktop combobox and mobile dialog list
+//! workspace index hits and navigate on selection.
+//!
+//! ## Feature flags
+//!
+//! | Feature | Effect |
+//! |---------|--------|
+//! | `default` | Enables `full` (all optional app-bar offerings). |
+//! | `offering-help` | Help tour widget in the default utilities pack. |
+//! | `offering-apps` | Marker: host should link `uf-apps` so its Apps launcher appears. |
+//! | `offering-appearance` | Appearance control in the default utilities pack. |
+//! | `full` | All three offering flags above. |
+//! | `ssr` | Server fns for workspace search and search-source registry on SSR builds. |
+//! | `hydrate` | Client hydration for shell components and search UI. |
+//! | `permissions` | Placeholder until Gauge is git-standalone; gates stay fail-closed. |
 //!
 //! ## Examples
 //!

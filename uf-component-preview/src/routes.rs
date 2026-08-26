@@ -4,7 +4,7 @@ use leptos_router::Lazy;
 
 /// Transparent component for Orbital component component preview catalog routes
 ///
-/// Registry-driven previews are served at `/orbital/{slug}` via [`PreviewSlugPage`].
+/// Registry-driven previews are served at `/orbital/{slug}` via [`PreviewSlugPage`](crate::preview::PreviewSlugPage).
 #[allow(missing_docs)]
 #[orbital_macros::orbital_routes_extract]
 #[component(transparent)]

@@ -43,9 +43,9 @@ fn validate_highlight(feature_highlight: &str) -> Result<(), crate::HelpError> {
 ///
 /// # Errors
 ///
-/// - [`HelpError::InvalidRoute`] when `route` is empty or longer than 512 bytes.
-/// - [`HelpError::Unauthenticated`] when there is no session.
-/// - [`HelpError::Storage`] on Valence I/O failure.
+/// - [`crate::HelpError::InvalidRoute`] when `route` is empty or longer than 512 bytes.
+/// - [`crate::HelpError::Unauthenticated`] when there is no session.
+/// - [`crate::HelpError::Storage`] on Valence I/O failure.
 /// - `"SSR required"` when this crate is built without the `ssr` feature.
 #[uf_product_macros::server]
 pub async fn help_list_visits_for_route(
@@ -105,9 +105,9 @@ pub async fn help_pending_steps_for_route(
 ///
 /// # Errors
 ///
-/// - [`HelpError::InvalidRoute`] / [`HelpError::InvalidHighlight`] per step key.
-/// - [`HelpError::Unauthenticated`] when there is no session.
-/// - [`HelpError::Storage`] on Valence upsert failure.
+/// - [`crate::HelpError::InvalidRoute`] / [`crate::HelpError::InvalidHighlight`] per step key.
+/// - [`crate::HelpError::Unauthenticated`] when there is no session.
+/// - [`crate::HelpError::Storage`] on Valence upsert failure.
 /// - `"SSR required"` without the `ssr` feature.
 #[uf_product_macros::server]
 pub async fn help_mark_steps_seen(
@@ -135,9 +135,9 @@ pub async fn help_mark_steps_seen(
 ///
 /// # Errors
 ///
-/// - [`HelpError::InvalidRoute`] when `route` fails validation.
-/// - [`HelpError::Unauthenticated`] when there is no session.
-/// - [`HelpError::Storage`] on Valence read/write failure.
+/// - [`crate::HelpError::InvalidRoute`] when `route` fails validation.
+/// - [`crate::HelpError::Unauthenticated`] when there is no session.
+/// - [`crate::HelpError::Storage`] on Valence read/write failure.
 /// - `"SSR required"` without the `ssr` feature.
 #[uf_product_macros::server]
 pub async fn help_request_replay_for_route(route: String) -> Result<(), ServerFnError> {
@@ -159,7 +159,7 @@ pub async fn help_request_replay_for_route(route: String) -> Result<(), ServerFn
 ///
 /// # Errors
 ///
-/// - [`HelpError::InvalidRoute`] when `route` fails validation.
+/// - [`crate::HelpError::InvalidRoute`] when `route` fails validation.
 /// - `"SSR required"` without the `ssr` feature.
 #[uf_product_macros::server]
 pub async fn help_repository_for_route(route: String) -> Result<Option<String>, ServerFnError> {
@@ -179,10 +179,10 @@ pub async fn help_repository_for_route(route: String) -> Result<Option<String>, 
 ///
 /// # Errors
 ///
-/// - [`HelpError::Validation`] for empty or oversized fields.
-/// - [`HelpError::RateLimited`] when the host throttle fires.
-/// - [`HelpError::Misconfigured`] when the route has no parseable GitHub repository.
-/// - [`HelpError::GitHubUpstream`] on GitHub API failure.
+/// - [`crate::HelpError::Validation`] for empty or oversized fields.
+/// - [`crate::HelpError::RateLimited`] when the host throttle fires.
+/// - [`crate::HelpError::Misconfigured`] when the route has no parseable GitHub repository.
+/// - [`crate::HelpError::GitHubUpstream`] on GitHub API failure.
 /// - `"SSR required"` without the `ssr` feature.
 #[allow(clippy::too_many_arguments)]
 #[uf_product_macros::server]

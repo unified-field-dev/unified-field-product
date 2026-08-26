@@ -34,6 +34,22 @@ pub fn resolve_app_for_path(path: &str, table: &[UfAppRouteEntry]) -> UfAppRoute
 }
 
 /// Tracks navigations under the main app router and emits Spectra page-view telemetry.
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// use leptos::prelude::*;
+/// use uf_product::telemetry::page_view_tracker::{PageViewTracker, UfAppRouteEntry};
+///
+/// static ROUTES: &[UfAppRouteEntry] = &[UfAppRouteEntry {
+///     app_id: "counter",
+///     app_name: "Counter",
+///     route_prefix: "/counter",
+///     brand_seed: "#1a6f94",
+/// }];
+/// view! { <PageViewTracker routes=ROUTES surface="main".to_string() /> };
+/// assert_eq!(ROUTES[0].app_id, "counter");
+/// ```
 #[component]
 pub fn PageViewTracker(
     /// Route paths this applies to.

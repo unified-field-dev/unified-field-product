@@ -1,29 +1,26 @@
 #![recursion_limit = "256"]
 #![allow(missing_docs)]
-//! Component library and preview tool for Orbital UI components ("Orbital" dev app).
+//! Component library and preview host for Orbital UI in Unified Field product builds.
 //!
-//! Renders a registry-driven catalog at `/orbital/{slug}` covering previewable
-//! components across Orbital leaf crates (via
-//! [`orbital_primitives::preview::collect_all_preview_registrations`]), plus
-//! Unified Field–specific previews and layout examples. Primary teaching path is
-//! the live `/orbital` app (see `examples/component-preview-host`); rustdoc indexes
-//! the mount APIs integrators call.
-//!
-//! Shipped product app chrome, host auth, session, and search production wiring
-//! live outside this crate. Design-system component implementations come from
-//! Orbital leaf crates.
-//!
-//! ## Concern → API
-//!
-//! | Concern | API |
-//! |---------|-----|
-//! | Mount the Orbital catalog routes | [`OrbitalComponentRoutes`], [`paths`] |
-//! | Build / merge the preview registry | [`preview::collect_preview_registrations`] |
-//! | Render a slug from the registry | [`preview::PreviewSlugPage`] |
-//! | Catalog chrome (nav / search / shell) | [`preview::PreviewCatalogShell`], [`preview::PreviewCatalogNav`], [`preview::PreviewCatalogSearch`] |
-//! | Prefetch a component family | [`prefetch_family`] |
+//! Serves a registry-driven catalog at `/orbital/{slug}` for previewable components
+//! from Orbital leaf crates (via
+//! [`orbital_primitives::preview::collect_all_preview_registrations`]), plus Unified
+//! Field-specific previews and layout examples. Integrators mount this crate in dev or
+//! staging hosts; production shell chrome, auth, and search wiring live outside it.
 //!
 //! ## Features
+//!
+//! - **Orbital preview catalog** — Nested `/orbital` routes backed by [`OrbitalComponentRoutes`].
+//!   Registry-driven slug pages, introduction, and catalog shell chrome. Mount once in a
+//!   dev or staging host router (typically not production). [Get started](#getting-started)
+//! - **Preview registry merge** — [`preview::collect_preview_registrations`] merges Orbital baseline,
+//!   UF manual pages, and teaching examples for slug routing via [`preview::PreviewSlugPage`].
+//! - **Catalog chrome** — [`preview::PreviewCatalogShell`], [`preview::PreviewCatalogNav`], and
+//!   [`preview::PreviewCatalogSearch`] compose the left nav and search for the catalog.
+//! - **Teaching example** — [`components::examples::DemoStatusPill`] demonstrates `#[component_doc]`
+//!   registration end to end.
+//!
+//! ## Feature flags
 //!
 //! | Feature | Effect |
 //! |---------|--------|
@@ -37,8 +34,13 @@
 //!
 //! ## Getting started
 //!
-//! Mount [`OrbitalComponentRoutes`] inside your host's `<Routes>` (typically only in
-//! non-production builds):
+//! [`OrbitalComponentRoutes`] exposes the nested Leptos route tree for the Orbital catalog at
+//! `/orbital`. Mount it inside the host `<Routes>` in dev or staging builds so designers and
+//! engineers can browse registry-driven component previews without shipping catalog routes in
+//! production.
+//!
+//! **Prerequisites:** `ssr` and/or `hydrate` on `uf-component-preview` and host deps; linked
+//! Orbital preview registrations from leaf crates when using the full catalog.
 //!
 //! ```rust,ignore
 //! use leptos_router::components::Routes;
@@ -51,11 +53,14 @@
 //! }
 //! ```
 //!
+//! On success the host serves `/orbital` (introduction) and `/orbital/{slug}` registry pages.
+//! Runnable reference: `cargo check -p component-preview-host --features ssr`.
+//!
 //! ## Examples
 //!
 //! | Level | Where | What |
 //! |-------|-------|------|
-//! | Highlight | Getting started above | Mount [`OrbitalComponentRoutes`] |
+//! | Highlight | [Getting started](#getting-started) | Mount [`OrbitalComponentRoutes`] |
 //! | Mid | [`components::examples`] | Teaching `#[component_doc]` widget (`demo-status-pill`) |
 //! | Detailed | `examples/component-preview-host` | Full `/orbital` host; enable `record-history` / `tag-catalog` on SSR |
 //!

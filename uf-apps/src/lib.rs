@@ -11,27 +11,26 @@
 //!
 //! ## Features
 //!
-//! | Feature | Start here |
-//! |---------|------------|
-//! | Searchable app index | [`AppsIndexPage`], [`server::get_apps_page`] |
-//! | App detail overview | [`AppDetailPage`], [`server::get_app_overview`] |
-//! | App-bar Apps launcher | [`ensure_app_bar_linked`], [`AppBarAppsButton`], [`apps_launcher::AppsLauncher`] |
-//! | Register this directory as an app | `uf_app!` below (`id: "apps"`, `/apps`) |
-//!
-//! ### Routes vs app-bar launcher
-//!
-//! Mount [`UfAppsRoutes`] (or lazy equivalents) in the host router and `/apps`
-//! works immediately. [`ensure_app_bar_linked`] is separate: it registers the
-//! app-bar Apps button and [`AppsLauncher`] dialog. Skip it when you only need
-//! the directory pages or you drive the launcher yourself.
+//! - **Apps directory routes** — Nested `/apps` and `/apps/:app_name` pages backed by
+//!   [`UfAppsRoutes`]. Mount in the host router; metadata comes from `uf_app!` inventory.
+//!   [Get started](#getting-started)
+//! - **Searchable app index** — Paginated grid with case-insensitive search over registered
+//!   app names and descriptions via [`AppsIndexPage`] and [`server::get_apps_page`].
+//!   [Get started](#searchable-app-index)
+//! - **App-bar Apps launcher** — Stock app-bar Apps button and typeahead dialog. Call
+//!   [`ensure_app_bar_linked`] once at host boot. [Get started](#link-app-bar-launcher)
+//! - **App detail overview** — Per-app overview card from [`AppDetailPage`] and
+//!   [`server::get_app_overview`].
+//! - **Apps directory self-registration** — This crate registers itself with `uf_app!`
+//!   (`id: "apps"`, route `/apps`) so it appears in the host app inventory.
 //!
 //! ## Searchable app index
 //!
-//! [`AppsIndexPage`] binds a search box to [`server::get_apps_page`]. Each call
-//! Returns an [`orbital_paging::Page`] of [`server::AppDirectoryItem`] rows
-//! (name, slug, description, `route_path`, optional `repository` / `crate_name`).
-//! The server sorts by name, applies a case-insensitive name/description filter
-//! when `query` is non-blank, then slices with the orbital over-fetch pattern.
+//! [`AppsIndexPage`] binds a search box to [`server::get_apps_page`]. Each call returns
+//! an [`orbital_paging::Page`] of [`server::AppDirectoryItem`] rows (name, slug,
+//! description, `route_path`, optional `repository` / `crate_name`). The server sorts
+//! by name, applies a case-insensitive name/description filter when `query` is
+//! non-blank, then slices with the orbital over-fetch pattern.
 //!
 //! ```rust,ignore
 //! use uf_apps::server::{filter_apps_by_query, get_apps_page, AppDirectoryItem};
@@ -39,6 +38,7 @@
 //! // Same filter the index page uses before pagination:
 //! let mut apps: Vec<AppDirectoryItem> = /* from get_apps() or tests */;
 //! filter_apps_by_query(&mut apps, Some("beacon"));
+//! assert!(apps.iter().all(|a| a.name.to_lowercase().contains("beacon")));
 //!
 //! // Infinite scroll fetch (what AppsIndexPage passes to OrbitalInfiniteScroll):
 //! let page = get_apps_page(0, 12, Some("beacon".into())).await?;
@@ -59,14 +59,16 @@
 //!
 //! ## Getting started
 //!
+//! Mount [`UfAppsRoutes`] inside the host Leptos router to expose the searchable
+//! `/apps` directory and per-app detail pages. Every `uf_app!` registration in the
+//! linked binary appears on the index automatically—no Valence reads or permission
+//! gates. Optional app-bar wiring is separate; see [Link app-bar launcher](#link-app-bar-launcher).
+//!
 //! ### 1. Mount the directory
 //!
 //! ```rust,ignore
 //! use leptos_router::components::Routes;
-//! use uf_apps::{ensure_app_bar_linked, UfAppsRoutes};
-//!
-//! // Optional: app-bar Apps button + launcher dialog (routes work without this).
-//! ensure_app_bar_linked();
+//! use uf_apps::UfAppsRoutes;
 //!
 //! view! {
 //!     <Routes fallback=|| "not found">
@@ -112,21 +114,30 @@
 //! Inventory-only smoke (no Leptos mount):
 //! `cargo run -p uf-product --example uf_app_registration --features ssr`.
 //!
-//! ### 3. Open the launcher from custom chrome
+//! ## Link app-bar launcher
 //!
-//! Prefer [`ensure_app_bar_linked`] for the stock app bar. To drive the dialog
-//! yourself:
+//! [`ensure_app_bar_linked`] registers the stock [`AppBarAppsButton`] and
+//! [`apps_launcher::AppsLauncher`] dialog with the product app bar. Call it once
+//! at host boot before rendering shell chrome; it invokes
+//! [`uf_product::register_app_bar_utility`] so inventory submissions survive linking.
 //!
 //! ```rust,ignore
 //! use leptos::prelude::*;
-//! use uf_apps::apps_launcher::AppsLauncher;
+//! use uf_apps::{ensure_app_bar_linked, apps_launcher::AppsLauncher};
+//! use uf_product::register_app_bar_utility;
+//!
+//! // Once at host boot, before UnifiedFieldShellLayout renders:
+//! ensure_app_bar_linked();
 //!
 //! let open = RwSignal::new(false);
 //! view! {
-//!     <button on:click=move |_| open.set(true)>"Apps"</button>
 //!     <AppsLauncher open=open />
-//! }
+//! };
+//! assert!(true, "register_app_bar_utility runs inside ensure_app_bar_linked");
 //! ```
+//!
+//! Prefer this path for the stock app bar. To drive the dialog from custom chrome,
+//! skip `ensure_app_bar_linked` and mount [`AppsLauncher`] behind your own trigger.
 //!
 //! ## Examples
 //!
@@ -142,7 +153,7 @@
 //! - [`AppsIndexPage`] / [`AppDetailPage`] — index grid and overview card.
 //! - [`mod@apps_launcher`] — Dialog typeahead ([`AppsLauncher`], [`safe_app_route_path`]).
 //! - [`mod@server`] — [`server::get_apps_page`], [`server::get_app_overview`], [`server::AppDirectoryItem`].
-//! - [`mod@help_steps`] — seeded Help spotlight steps; call [`ensure_help_linked`] so
+//! - [`ensure_help_linked`] — seeded Help spotlight steps; call once so
 //!   inventory links into the host binary (see [`uf_help`] authoring ladder).
 //! - [`uf_product::AppRegistration`] / [`uf_product::AppRegistry`] — registration contracts.
 //! - `uf_product_macros::uf_app` — registration macro (see that crate; smoke:

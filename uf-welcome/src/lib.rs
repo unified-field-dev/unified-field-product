@@ -10,49 +10,85 @@
 //!
 //! ## Features
 //!
+//! - **Welcome landing routes** — Nested `/welcome` and `/welcome/admin` pages with
+//!   usage cards backed by Spectra page views. Mount once in the host router and wire
+//!   [`uf_product::PageViewTracker`] so recent, popular, and most-used cards populate.
+//!   [Get started](#getting-started)
+//! - **Featured apps admin** — Valence-backed catalog for the Featured card. Operators
+//!   with `WelcomeAdmin` add, remove, and reorder rows at `/welcome/admin`.
+//!   [Get started](#featured-admin)
+//! - **Welcome shell layout** — [`WelcomeLayout`] wraps shell chrome and requires sign-in
+//!   before child routes render.
+//! - **Help spotlight inventory** — Welcome-route help steps register through inventory;
+//!   call [`ensure_help_linked`] once at host boot so the linker retains them.
+//! - **Permission manifest** — [`permissions::WelcomePermission`] declares the
+//!   `WelcomeAdmin` capability for featured curation.
+//!
+//! ## Feature flags
+//!
 //! | Feature | Effect |
 //! |---------|--------|
 //! | `lazy-routes` (default) | WASM-split welcome + admin route views; use [`prefetch_family`] |
 //! | `admin-permissions` | Gauge-backed `WelcomeAdmin` gate on `/welcome/admin` |
 //! | `ssr` / `hydrate` | Server and client Leptos graphs |
 //!
-//! ## Concern → API
-//!
-//! | Concern | API |
-//! |---------|-----|
-//! | Mount welcome + admin | [`UfWelcomeRoutes`] |
-//! | Welcome page | [`WelcomePage`] |
-//! | Featured admin | [`WelcomeAdminPage`], `welcome::featured` (SSR) |
-//! | Permission manifest | [`permissions::WelcomePermission`] |
-//! | Help spotlight inventory | [`ensure_help_linked`] |
-//!
 //! ## Getting started
 //!
-//! Mount [`UfWelcomeRoutes`] inside the host `<Routes>`, provide `Arc<Spectra>`, and
-//! mount `uf_product::PageViewTracker` so usage cards receive page-view events.
+//! [`UfWelcomeRoutes`] exposes nested Leptos routes for the signed-in welcome page and
+//! the featured-apps admin UI. Mount it inside the host `<Routes>` and place
+//! [`uf_product::PageViewTracker`] beside the router so Spectra receives page-view events for the
+//! usage cards on `/welcome`.
+//!
+//! **Prerequisites:** `ssr` and/or `hydrate` on `uf-welcome` and host deps; signed-in
+//! session from `uf-product`; `Arc<Spectra>` in SSR context for usage aggregators.
 //!
 //! ```rust,ignore
 //! use leptos_router::components::Routes;
+//! use uf_product::telemetry::PageViewTracker;
 //! use uf_welcome::UfWelcomeRoutes;
 //!
 //! view! {
+//!     <PageViewTracker routes=ROUTES surface="main".to_string() />
 //!     <Routes fallback=|| "not found">
 //!         <UfWelcomeRoutes />
 //!     </Routes>
 //! }
 //! ```
 //!
-//! Enable `admin-permissions` (and Gauge) when `/welcome/admin` should enforce
-//! `WelcomeAdmin`. Without that feature, the admin page still mounts; authorization
-//! follows the host's Gauge wiring and e2e session override (`E2E_WELCOME_ADMIN_SESSION_KEY`
-//! under SSR). Featured service errors use `FeaturedError` (see `welcome/featured`).
+//! On success the host serves `/welcome` with featured, recent, most-used, and popular
+//! cards once page views flow into Spectra. Runnable reference:
+//! `cargo check -p shell-chrome-host --features ssr`.
+//!
+//! ## Featured admin
+//!
+//! [`WelcomeAdminPage`] renders the `/welcome/admin` UI for curating featured apps.
+//! Server mutations require `WelcomeAdmin` from [`permissions::WelcomePermission`]
+//! (enable `admin-permissions` for Gauge enforcement). Domain errors surface as
+//! [`featured::FeaturedError`] before server functions map them to transport errors.
+//!
+//! **Prerequisites:** `ssr` on `uf-welcome`; System Valence for catalog writes;
+//! registered apps in [`uf_product::AppRegistry`]; signed-in operator with `WelcomeAdmin`.
+//!
+//! ```rust,ignore
+//! use uf_welcome::featured::{add, FeaturedError};
+//! use uf_welcome::WelcomeAdminPage;
+//!
+//! // WelcomeAdmin permission gates server fns (see permissions::WelcomePermission).
+//! let err = add(&system_valence, "zz-unknown-app", 0).await.unwrap_err();
+//! assert!(matches!(err, FeaturedError::UnknownApp { .. }));
+//!
+//! view! { <WelcomeAdminPage /> }
+//! ```
+//!
+//! On success promoted apps appear on the welcome Featured card ordered by ordinal.
+//! Deep dive: `cargo test -p uf-welcome --features ssr --test featured_service_integ`.
 //!
 //! ## Examples
 //!
 //! | Level | Where | What |
 //! |-------|-------|------|
-//! | Highlight | Getting started above | Mount [`UfWelcomeRoutes`] |
-//! | Mid | `welcome/featured` + `admin-permissions` | Featured admin gate + `FeaturedError` |
+//! | Highlight | [Getting started](#getting-started) | Mount [`UfWelcomeRoutes`] + [`uf_product::PageViewTracker`] |
+//! | Mid | [Featured admin](#featured-admin) | `WelcomeAdmin` gate + [`featured::FeaturedError`] |
 //! | Detailed | `examples/shell-chrome-host`, `tests/featured_service_integ.rs` | Shell mount + admin integ |
 //!
 //! ```bash

@@ -11,7 +11,7 @@ use crate::server::{get_apps_page, APPS_PAGE_SIZE};
 
 /// Apps directory index: searchable, paginated grid of every registered app.
 ///
-/// Wires [`AppSearchInput`] to [`crate::server::get_apps_page`] through
+/// Wires the index search input to [`crate::server::get_apps_page`] through
 /// [`uf_product::components::OrbitalInfiniteScroll`]. Re-mounts the scroll
 /// host when the query changes so offset resets. Empty results use
 /// [`uf_product::components::EmptyState`].

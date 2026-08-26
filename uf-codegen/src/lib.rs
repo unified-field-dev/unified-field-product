@@ -8,28 +8,27 @@
 //! `AppRegistry` / inventory is in `uf-product::routes`. Host `<Routes>` composition
 //! and auth gates are host responsibilities.
 //!
-//! ## Concern → API
-//!
-//! | Concern | API |
-//! |---------|-----|
-//! | Configure a codegen pass | [`RoutesCodegenConfig`] |
-//! | Run discovery from `build.rs` | [`generate_registered_routes`] |
-//! | Classify codegen failures | [`RoutesCodegenError`] |
-//! | Inspect one discovered app | [`AppRouteInfo`] |
-//!
 //! ## Features
 //!
-//! - **Route discovery** — [`generate_registered_routes`] parses `src/lib.rs` and
-//!   `src/main.rs` of every package for `uf_app!` macro invocations
-//!   (via `syn`, no macro expansion needed).
-//! - **Dedup by app id** — when two packages register the same `app_id` (e.g. a legacy
-//!   core crate and its `*-app` wrapper), the `*-app` package wins.
-//! - **Generated outputs** — `uf_registered_routes.rs` (route component imports/re-exports)
-//!   and `uf_app_route_table.rs` (a static table for shell page-view analytics).
+//! - **Build-time route discovery** — Scans `src/lib.rs` and `src/main.rs` of every
+//!   workspace package for `uf_app!` invocations (via `syn`, without macro expansion)
+//!   and writes `uf_registered_routes.rs` plus `uf_app_route_table.rs` under `OUT_DIR`.
+//!   [Get started](#getting-started)
+//! - **Dedup by app id** — When two packages register the same `app_id`, the `*-app`
+//!   package wins over a legacy core crate.
+//! - **Generated outputs** — `uf_registered_routes.rs` provides route component
+//!   imports; `uf_app_route_table.rs` is a static table for shell page-view analytics.
 //!
 //! ## Getting started
 //!
-//! Call this from a `build.rs` in the host app crate:
+//! Host product shells call [`generate_registered_routes`] once from the `app` crate's
+//! `build.rs` after workspace members declare routes with `uf_app!`. The pass loads
+//! Cargo workspace metadata, parses macro invocations as source text, and writes
+//! include files your host `include!`s when building the router.
+//!
+//! **Prerequisites:** add `uf-codegen` as a `build-dependency`; workspace members with
+//! `uf_app!` in `src/lib.rs` or `src/main.rs`; host `build.rs` one level under the
+//! workspace root so [`RoutesCodegenConfig::workspace_root`] resolves correctly.
 //!
 //! ```rust,no_run
 //! use std::path::PathBuf;
@@ -51,22 +50,25 @@
 //! }
 //! ```
 //!
-//! ## Examples
+//! On success the pass returns `Ok(())` and writes `uf_registered_routes.rs` (and
+//! `uf_app_route_table.rs`) under `OUT_DIR`. Match [`RoutesCodegenError`] in `build.rs`
+//! or propagate with `?`.
 //!
-//! | Level | Where | What |
-//! |-------|-------|------|
-//! | Highlight | Getting started above | `RoutesCodegenConfig` + `generate_registered_routes` |
-//! | Detailed | workspace `uf-codegen/examples/emit_routes_table.rs` | Writes includes mentioning `sample-beacon` |
+//! **Variant — fixture workspace without a full host:** run the named example to emit
+//! includes from the bundled `sample-beacon` fixture:
 //!
 //! ```bash
 //! cargo run -p uf-codegen --example emit_routes_table
 //! ```
 //!
+//! Stdout prints `emit_routes_table: OK` and the generated `uf_registered_routes.rs`
+//! contains `sample-beacon`.
+//!
 //! ## Where to look next
 //!
-//! - [`RoutesCodegenConfig`] — inputs to the codegen pass.
+//! - [`RoutesCodegenConfig`] — inputs to the codegen pass (`extra_packages`, `excluded_packages`).
 //! - [`AppRouteInfo`] — one discovered app's registration metadata.
-//! - [`generate_registered_routes`] — the entry point, called from `build.rs`.
+//! - [`RoutesCodegenError`] — metadata, path, and I/O failures from the pass.
 //! - `uf-product-macros` — `uf_app!` fields scanned by this crate.
 //! - `uf-product::routes` — runtime registry built from inventory (separate from these includes).
 //! - `uf-product/examples` — `app_route_paths` / `auth_shell_host` for runtime discovery smoke.
