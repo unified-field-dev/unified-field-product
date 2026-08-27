@@ -63,7 +63,7 @@ jobs:
       - name: Checkout uf-notifications (private path dep)
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          repository: unified-field-dev/uf-notifications
+          repository: deathbreakfast/uf-notifications
           path: ${{ env.UF_ROOT }}/L2-product-platform/uf-notifications
           ssh-key: ${{ secrets.UF_NOTIFICATIONS_CLONE_SSH_KEY }}
       - name: Checkout lepton-uf-app (private path dep)
@@ -132,7 +132,7 @@ jobs:
       - name: Checkout uf-notifications (private path dep)
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          repository: unified-field-dev/uf-notifications
+          repository: deathbreakfast/uf-notifications
           path: ${{ env.UF_ROOT }}/L2-product-platform/uf-notifications
           ssh-key: ${{ secrets.UF_NOTIFICATIONS_CLONE_SSH_KEY }}
       - name: Checkout lepton-uf-app (private path dep)
@@ -204,7 +204,7 @@ jobs:
       - name: Checkout uf-notifications (private path dep)
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          repository: unified-field-dev/uf-notifications
+          repository: deathbreakfast/uf-notifications
           path: ${{ env.UF_ROOT }}/L2-product-platform/uf-notifications
           ssh-key: ${{ secrets.UF_NOTIFICATIONS_CLONE_SSH_KEY }}
       - name: Checkout lepton-uf-app (private path dep)
@@ -275,7 +275,7 @@ jobs:
       - name: Checkout uf-notifications (private path dep)
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          repository: unified-field-dev/uf-notifications
+          repository: deathbreakfast/uf-notifications
           path: ${{ env.UF_ROOT }}/L2-product-platform/uf-notifications
           ssh-key: ${{ secrets.UF_NOTIFICATIONS_CLONE_SSH_KEY }}
       - name: Checkout lepton-uf-app (private path dep)
@@ -345,7 +345,7 @@ jobs:
       - name: Checkout uf-notifications (private path dep)
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          repository: unified-field-dev/uf-notifications
+          repository: deathbreakfast/uf-notifications
           path: ${{ env.UF_ROOT }}/L2-product-platform/uf-notifications
           ssh-key: ${{ secrets.UF_NOTIFICATIONS_CLONE_SSH_KEY }}
       - name: Checkout lepton-uf-app (private path dep)
