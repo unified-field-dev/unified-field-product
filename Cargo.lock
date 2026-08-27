@@ -568,6 +568,7 @@ dependencies = [
 [[package]]
 name = "chronon-core"
 version = "0.1.3"
+source = "git+https://github.com/unified-field-dev/chronon?tag=v0.1.3#c43e16dbec81d3cab4bd77be2a2fc056cbaa220d"
 dependencies = [
  "async-trait",
  "chrono",
@@ -580,8 +581,7 @@ dependencies = [
 
 [[package]]
 name = "chronon-core"
-version = "0.1.3"
-source = "git+https://github.com/unified-field-dev/chronon?tag=v0.1.3#c43e16dbec81d3cab4bd77be2a2fc056cbaa220d"
+version = "0.1.4"
 dependencies = [
  "async-trait",
  "chrono",
@@ -609,11 +609,11 @@ dependencies = [
 
 [[package]]
 name = "chronon-executor"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "chrono",
- "chronon-core 0.1.3",
- "chronon-telemetry 0.1.3",
+ "chronon-core 0.1.4",
+ "chronon-telemetry 0.1.4",
  "serde_json",
  "tokio",
  "tracing",
@@ -651,7 +651,7 @@ dependencies = [
 
 [[package]]
 name = "chronon-telemetry"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "parking_lot",
  "tracing",
@@ -662,7 +662,7 @@ dependencies = [
 name = "chronon-valence-identity"
 version = "0.1.0"
 dependencies = [
- "chronon-core 0.1.3 (git+https://github.com/unified-field-dev/chronon?tag=v0.1.3)",
+ "chronon-core 0.1.3",
  "serde_json",
  "uf-valence",
 ]
@@ -1438,8 +1438,8 @@ dependencies = [
  "chrono",
  "chronon-coordinator",
  "chronon-coordinator-macros",
- "chronon-core 0.1.3",
- "chronon-executor 0.1.3",
+ "chronon-core 0.1.4",
+ "chronon-executor 0.1.4",
  "chronon-valence-identity",
  "higgs 0.1.0",
  "higgs-host 0.1.0",

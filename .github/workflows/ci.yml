@@ -1,5 +1,5 @@
 # PR / merge gate aligned with docs/VERIFICATION.md Layer 1 + documentation gates.
-# Path patches and lepton path deps assume a Unified Field monorepo layout; CI
+# Path patches and lepton path deps assume the Unified Field operator checkout layout; CI
 # checks this repo out under that path and shallow-clones siblings.
 #
 # Pull requests: `pull_request` runs for branches on unified-field-dev/{repo}.

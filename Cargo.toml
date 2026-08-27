@@ -46,6 +46,7 @@ pedantic = { level = "warn", priority = -1 }
 nursery = { level = "warn", priority = -1 }
 # Newer nightly pedantic lint; keep existing assert style in tests.
 assert_is_empty = "allow"
+empty_enums = "allow"
 dbg_macro = "deny"
 module_name_repetitions = "allow"
 must_use_candidate = "allow"
