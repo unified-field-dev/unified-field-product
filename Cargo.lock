@@ -3557,6 +3557,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "orbital-shell"
+version = "0.1.2"
+source = "git+https://github.com/unified-field-dev/orbital?branch=main#e3175e5bbf19610fd1951c6c54b57c0ff95b6260"
+dependencies = [
+ "icondata",
+ "icondata_core",
+ "leptos",
+ "leptos_router",
+ "orbital-base-components 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-core-components 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-macros 0.1.3 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-primitives 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "pulldown-cmark",
+ "serde",
+ "turf",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
 name = "orbital-style"
 version = "0.1.2"
 dependencies = [
@@ -3641,13 +3661,46 @@ dependencies = [
  "orbital-motion 0.1.2",
  "orbital-paging 0.1.2",
  "orbital-primitives 0.1.2",
- "orbital-shell",
+ "orbital-shell 0.1.2",
  "orbital-style 0.1.2",
  "orbital-theme 0.1.2",
  "pulldown-cmark",
  "serde",
  "serde_json",
  "tokio",
+ "turf",
+ "url",
+ "urlencoding",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "orbital-ui"
+version = "0.1.2"
+source = "git+https://github.com/unified-field-dev/orbital?branch=main#e3175e5bbf19610fd1951c6c54b57c0ff95b6260"
+dependencies = [
+ "cfg-if",
+ "http",
+ "icondata",
+ "icondata_core",
+ "inventory",
+ "js-sys",
+ "leptos",
+ "leptos_meta",
+ "leptos_router",
+ "orbital-base-components 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-core-components 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-macros 0.1.3 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-motion 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-paging 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-primitives 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-shell 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-style 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-theme 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "pulldown-cmark",
+ "serde",
+ "serde_json",
  "turf",
  "url",
  "urlencoding",
@@ -4476,12 +4529,12 @@ dependencies = [
  "chrono",
  "leptos",
  "leptos_router",
- "orbital-base-components 0.1.2",
- "orbital-macros 0.1.3",
- "orbital-paging 0.1.2",
+ "orbital-base-components 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-macros 0.1.3 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-paging 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-ui 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
  "serde",
  "serde_json",
- "uf-product",
  "uf-valence",
 ]
 
@@ -5469,7 +5522,7 @@ dependencies = [
  "chrono",
  "inventory",
  "leptos",
- "orbital-macros 0.1.3",
+ "orbital-macros 0.1.3 (git+https://github.com/unified-field-dev/orbital?branch=main)",
  "serde",
  "serde_json",
  "tracing",
@@ -5494,8 +5547,8 @@ dependencies = [
  "leptos_meta",
  "leptos_router",
  "log",
- "orbital-macros 0.1.3",
- "orbital-theme 0.1.2",
+ "orbital-macros 0.1.3 (git+https://github.com/unified-field-dev/orbital?branch=main)",
+ "orbital-theme 0.1.2 (git+https://github.com/unified-field-dev/orbital?branch=main)",
  "record-history-leptos",
  "serde",
  "serde_json",
@@ -6140,7 +6193,7 @@ dependencies = [
  "orbital-paging 0.1.2",
  "orbital-primitives 0.1.2",
  "orbital-scheduler 0.1.2",
- "orbital-shell",
+ "orbital-shell 0.1.2",
  "orbital-theme 0.1.2",
  "orbital-tree 0.1.2",
  "record-history-leptos",
@@ -6198,7 +6251,7 @@ dependencies = [
  "orbital-macros 0.1.3",
  "orbital-paging 0.1.2",
  "orbital-primitives 0.1.2",
- "orbital-shell",
+ "orbital-shell 0.1.2",
  "orbital-theme 0.1.2",
  "turf",
  "uf-appearance",
@@ -6278,9 +6331,9 @@ dependencies = [
  "leptos_axum",
  "leptos_meta",
  "leptos_router",
- "orbital-shell",
+ "orbital-shell 0.1.2",
  "orbital-theme 0.1.2",
- "orbital-ui",
+ "orbital-ui 0.1.2",
  "serde",
  "serde_json",
  "tokio",

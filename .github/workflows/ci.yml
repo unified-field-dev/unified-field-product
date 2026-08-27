@@ -1,6 +1,10 @@
 # PR / merge gate aligned with docs/VERIFICATION.md Layer 1 + documentation gates.
 # Path patches and lepton path deps assume a Unified Field monorepo layout; CI
 # checks this repo out under that path and shallow-clones siblings.
+#
+# Pull requests: `pull_request` runs for branches on unified-field-dev/{repo}.
+# Fork PRs (deathbreakfast → uf-dev) need either (a) push the branch to uf-dev and
+# open a same-repo PR, or (b) repo Settings → Actions → allow workflows from fork PRs.
 name: CI
 
 on:
