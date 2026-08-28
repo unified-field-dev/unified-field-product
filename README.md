@@ -3,7 +3,7 @@
 [![CI](https://github.com/unified-field-dev/unified-field-product/actions/workflows/ci.yml/badge.svg)](https://github.com/unified-field-dev/unified-field-product/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-[GitHub](https://github.com/unified-field-dev/unified-field-product) · `cargo doc -p uf-product --open` · distributed via git (not crates.io)
+[GitHub](https://github.com/unified-field-dev/unified-field-product) · `cargo doc -p uf-product --open`
 
 Product shell APIs for Unified Field Leptos hosts. Hosts (for example
 `lepton-uf-app`) depend on these crates for shell chrome, session/auth gates,
