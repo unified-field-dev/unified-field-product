@@ -30,6 +30,8 @@ uf-help-macros = { workspace = true }
 orbital-macros = { workspace = true }
 uf-product-macros = { workspace = true }
 orbital-paging = { workspace = true }
+# Force crc32fast 1.5.0 through the hydrate/dylint graph (see workspace pin).
+crc32fast = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
