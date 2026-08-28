@@ -57,11 +57,10 @@
 //!
 //! ## Examples
 //!
-//! | Level | Where | What |
-//! |-------|-------|------|
-//! | Highlight | [Getting started](#getting-started) | Mount [`OrbitalComponentRoutes`] |
-//! | Mid | [`components::examples`] | Teaching `#[component_doc]` widget (`demo-status-pill`) |
-//! | Detailed | `examples/component-preview-host` | Full `/orbital` host; enable `zone-previews` on SSR for L3 pages |
+//! Mount [`OrbitalComponentRoutes`] per [Getting started](#getting-started). Teaching
+//! `#[component_doc]` widget (`demo-status-pill`) in [`components::examples`]. Full
+//! `/orbital` host; enable `zone-previews` on SSR for L3 pages:
+//! `examples/component-preview-host`.
 //!
 //! ```bash
 //! cargo check -p component-preview-host --features ssr

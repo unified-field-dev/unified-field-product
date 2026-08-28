@@ -47,11 +47,9 @@
 //!
 //! ## Examples
 //!
-//! | Level | Where | What |
-//! |-------|-------|------|
-//! | Highlight | Getting started above | [`ensure_linked`] + [`AppBarAppearanceButton`] |
-//! | Mid | `uf-integrations` `offering-appearance` | Default app-bar utilities pack |
-//! | Detailed | `examples/shell-chrome-host` | Full shell with appearance control |
+//! Start with [`ensure_linked`] + [`AppBarAppearanceButton`] in
+//! [Getting started](#getting-started). Default app-bar utilities pack via `uf-integrations`
+//! `offering-appearance`. Full shell with appearance control: `examples/shell-chrome-host`.
 //!
 //! ```bash
 //! cargo check -p shell-chrome-host --features ssr

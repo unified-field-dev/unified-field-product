@@ -103,10 +103,9 @@
 //!
 //! ## Examples
 //!
-//! | Level | Where | What |
-//! |-------|-------|------|
-//! | Highlight | Getting started above | `uf_app!` registration fields |
-//! | Mid / detailed | `uf-product` example `uf_app_registration` | Inventory path list includes `/sample-beacon` |
+//! Start with `uf_app!` registration fields in [Getting started](#getting-started).
+//! Inventory path list includes `/sample-beacon` in `uf-product` example
+//! `uf_app_registration`.
 //!
 //! ```bash
 //! cargo run -p uf-product --example uf_app_registration --features ssr

@@ -200,11 +200,10 @@
 //!
 //! ## Examples
 //!
-//! | Level | Where | What |
-//! |-------|-------|------|
-//! | Highlight | Getting started above | `UnifiedFieldShellLayout` + `UnifiedFieldAppBar` + host auth menu + notification bell |
-//! | Mid | [`SearchSourcePicker`] item docs | Combobox keys + `query_many` options |
-//! | Detailed | workspace `examples/shell-chrome-host` | Layout, app bar, search, coming-soon, and 404 on one tree |
+//! Start with `UnifiedFieldShellLayout` + `UnifiedFieldAppBar` + host auth menu +
+//! notification bell in [Getting started](#getting-started). Combobox keys and `query_many`
+//! options on [`SearchSourcePicker`] item docs. Layout, app bar, search, coming-soon, and
+//! 404 on one tree: workspace `examples/shell-chrome-host`.
 //!
 //! ```bash
 //! cargo check -p shell-chrome-host --features ssr

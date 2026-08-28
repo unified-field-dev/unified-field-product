@@ -95,11 +95,10 @@
 //!
 //! ## Examples
 //!
-//! | Level | Where | What |
-//! |-------|-------|------|
-//! | Highlight | Getting started above | `SearchSourceProvider` + `inventory::submit!` |
-//! | Mid / detailed | workspace `uf-search-core/examples/query_many_stub.rs` | Fan-out `SearchSourceRegistry::query_many` |
-//! | UI | `uf-integrations::SearchSourcePicker` | Combobox over these DTOs |
+//! Start with `SearchSourceProvider` + `inventory::submit!` in
+//! [Getting started](#getting-started). Fan-out `SearchSourceRegistry::query_many` in
+//! workspace `uf-search-core/examples/query_many_stub.rs`. Combobox over these DTOs:
+//! `uf-integrations::SearchSourcePicker`.
 //!
 //! ```bash
 //! cargo run -p uf-search-core --example query_many_stub --features ssr

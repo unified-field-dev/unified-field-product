@@ -85,11 +85,10 @@
 //!
 //! ## Examples
 //!
-//! | Level | Where | What |
-//! |-------|-------|------|
-//! | Highlight | [Getting started](#getting-started) | Mount [`UfWelcomeRoutes`] + [`uf_product::PageViewTracker`] |
-//! | Mid | [Featured admin](#featured-admin) | `WelcomeAdmin` gate + [`featured::FeaturedError`] |
-//! | Detailed | `examples/shell-chrome-host`, `tests/featured_service_integ.rs` | Shell mount + admin integ |
+//! Mount [`UfWelcomeRoutes`] + [`uf_product::PageViewTracker`] per
+//! [Getting started](#getting-started). Featured admin: `WelcomeAdmin` gate +
+//! [`featured::FeaturedError`] in [Featured admin](#featured-admin). Shell mount + admin
+//! integ: `examples/shell-chrome-host`, `tests/featured_service_integ.rs`.
 //!
 //! ```bash
 //! cargo check -p shell-chrome-host --features ssr

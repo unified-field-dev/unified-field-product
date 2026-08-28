@@ -141,11 +141,10 @@
 //!
 //! ## Examples
 //!
-//! | Level | Where | What |
-//! |-------|-------|------|
-//! | Highlight | Getting started §1–2 | Mount [`UfAppsRoutes`], optional [`ensure_app_bar_linked`], full `uf_app!` |
-//! | Mid | Searchable app index above | [`server::filter_apps_by_query`] + [`server::get_apps_page`] |
-//! | Detailed | `shell-chrome-host`, `uf_app_registration` | Full host + inventory smoke |
+//! Mount [`UfAppsRoutes`], optional [`ensure_app_bar_linked`], and a full `uf_app!` per
+//! [Getting started](#getting-started) and [Link app-bar launcher](#link-app-bar-launcher).
+//! Searchable app index: [`server::filter_apps_by_query`] + [`server::get_apps_page`].
+//! Full host + inventory smoke: `shell-chrome-host`, `uf_app_registration`.
 //!
 //! ## Where to look next
 //!

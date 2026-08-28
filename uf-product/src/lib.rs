@@ -357,12 +357,13 @@
 //!
 //! ## Examples
 //!
-//! | Level | Where | What |
-//! |-------|-------|------|
-//! | Highlight | Getting started above | provide → hydrate → `use_authenticated_user` / `use_auth_state` |
-//! | Mid | [`provide_auth_context`], [`use_authenticated_user`], [`use_auth_state`] | Same flow on the items |
-//! | Detailed | workspace `uf-product/examples/` | `uf_app_registration` (`uf_app!`), `app_route_paths`, `auth_shell_host` (Axum inventory gate) |
-//! | Nested UI | workspace `examples/` | `shell-chrome-host`, `component-preview-host` |
+//! Start with `provide` → hydrate → [`use_authenticated_user`] / [`use_auth_state`] in
+//! [Getting started](#getting-started). Same flow on [`provide_auth_context`],
+//! [`use_authenticated_user`], and [`use_auth_state`].
+//!
+//! Workspace `uf-product/examples/`: `uf_app_registration` (`uf_app!`), `app_route_paths`,
+//! `auth_shell_host` (Axum inventory gate). Nested UI hosts in workspace `examples/`:
+//! `shell-chrome-host`, `component-preview-host`.
 //!
 //! ```bash
 //! cargo run -p uf-product --example uf_app_registration --features ssr
