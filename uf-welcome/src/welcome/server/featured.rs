@@ -99,23 +99,8 @@ fn harness_authenticated_valence() -> Option<valence::Valence> {
 async fn require_welcome_admin() -> Result<WelcomeAdminAccess, ServerFnError> {
     #[cfg(feature = "admin-permissions")]
     {
+        uf_product::permissions::require_permission(WELCOME_ADMIN).await?;
         let ctx = higgs::Higgs::from_request().await?;
-        let valence = ctx
-            .valence()
-            .map_err(|e| ServerFnError::new(format!("Failed to build Valence: {e}")))?;
-        let allowed = gauge::service::actor_can(&valence, WELCOME_ADMIN)
-            .await
-            .map_err(|e| {
-                ServerFnError::new(higgs::server_runtime::permission_check_failed_payload(
-                    WELCOME_ADMIN,
-                    &e.to_string(),
-                ))
-            })?;
-        if !allowed {
-            return Err(ServerFnError::new(
-                higgs::server_runtime::permission_denied_payload(WELCOME_ADMIN),
-            ));
-        }
         Ok(WelcomeAdminAccess::Higgs(ctx))
     }
     #[cfg(not(feature = "admin-permissions"))]
@@ -170,13 +155,7 @@ pub async fn can_manage_welcome_featured() -> Result<bool, ServerFnError> {
             if ctx.session_user_id().is_none() {
                 return Ok(false);
             }
-            let Ok(valence) = ctx.valence() else {
-                return Ok(false);
-            };
-            let allowed = gauge::service::actor_can(&valence, WELCOME_ADMIN)
-                .await
-                .unwrap_or(false);
-            return Ok(allowed);
+            return Ok(uf_product::permissions::has_permission(WELCOME_ADMIN).await);
         }
         #[cfg(not(feature = "admin-permissions"))]
         {

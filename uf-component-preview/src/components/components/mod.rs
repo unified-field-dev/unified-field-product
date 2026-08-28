@@ -4,9 +4,6 @@
 pub mod auto_grid_preview;
 /// Re-export of the empty-state component preview.
 pub mod empty_state_preview;
-/// Re-export of the infinite-scroll history-timeline preview (behind `record-history`).
-#[cfg(feature = "record-history")]
-pub mod history_timeline_preview;
 /// Re-export of the infinite-scroll component preview.
 pub mod infinite_scroll_preview;
 /// Re-export of the paginator component preview.
@@ -19,9 +16,6 @@ pub mod search_source_picker_preview;
 pub mod stat_card_preview;
 /// Re-export of the stepper component preview.
 pub mod stepper_preview;
-/// Tag catalog picker preview (behind the `tag-catalog` feature).
-#[cfg(feature = "tag-catalog")]
-pub mod tag_catalog_picker_preview;
 /// Re-export of the text component preview.
 pub mod text_preview;
 /// Unified Field icons preview page.
@@ -30,15 +24,11 @@ pub mod unified_field_icons_preview;
 // Re-export component previews
 pub use auto_grid_preview::AutoGridPreview;
 pub use empty_state_preview::EmptyStatePreview;
-#[cfg(feature = "record-history")]
-pub use history_timeline_preview::HistoryTimelinePreview;
 pub use infinite_scroll_preview::InfiniteScrollPreview;
 pub use paginator_preview::PaginatorPreview;
 pub use scroll_area_preview::ScrollAreaPreview;
 pub use search_source_picker_preview::SearchSourcePickerPreview;
 pub use stat_card_preview::StatCardPreview;
 pub use stepper_preview::StepperPreview;
-#[cfg(feature = "tag-catalog")]
-pub use tag_catalog_picker_preview::TagCatalogPickerPreview;
 pub use text_preview::TextPreview;
 pub use unified_field_icons_preview::UnifiedFieldIconsPreview;

@@ -14,7 +14,8 @@ Catalog routes and types: `cargo doc -p uf-component-preview --open`.
 - **Component preview pages** — one route per registered slug
 - **Component documentation** — docs and props from `#[component_doc]`
 - **Registry-driven catalog** — `PreviewCatalog` merges Orbital’s baseline with UF manuals
-- **Manual escape hatch** — History Timeline / Tag Catalog Picker stay hand-written (`preview = "manual"`) behind features
+- **Manual escape hatch** — Search Source Picker and Unified Field icons stay hand-written manuals in L2
+- **Host-extended L3 previews** — History Timeline and Tag Catalog Picker register in owning L3 crates; hosts call [`extend_registrations`](src/preview/extensions.rs) (see `component-preview-host` feature `zone-previews`)
 - **Teaching example** — `DemoStatusPill` (`demo-status-pill`) shows the registration path end to end
 - **Dev layout** — catalog shell for browsing components
 
@@ -57,7 +58,7 @@ Routes:
 
 1. Annotate with `#[component_doc(..., preview_slug = "...")]` in the owning crate (crate `preview` feature on).
 2. Export with `preview_registrations! { &YOUR_PREVIEW_REGISTRATION, … }`.
-3. In [`src/preview/registry.rs`](src/preview/registry.rs), `.extend(your_module::all())`.
+3. In the host binary, call `uf_component_preview::preview::extend_registrations(your_crate::preview::all())` before serving routes.
 4. Rebuild the host — the slug shows under left nav and at `/orbital/{slug}`.
 
 In-repo walkthrough widget: [`src/components/examples/demo_status_pill.rs`](src/components/examples/demo_status_pill.rs).
@@ -66,17 +67,16 @@ In-repo walkthrough widget: [`src/components/examples/demo_status_pill.rs`](src/
 
 Collection goes through `orbital_primitives::preview::PreviewCatalog` in
 `src/preview/registry.rs`: Orbital leaf tables + `uf_product` locals + Tier C manuals +
-teaching examples. New product widgets should use `#[component_doc]` and
-`preview_registrations!` in the owning crate, then `.extend` that crate’s `all()` here —
-not patches to Orbital.
+teaching examples + optional host extensions. New product widgets should use
+`#[component_doc]` and `preview_registrations!` in the owning crate, then
+`extend_registrations` from the host — not L2 path deps on L3 zone apps.
 
 ## Preview surfaces
 
 ### Basic
 
 - Text, Scroll Area, Infinite Scroll, Stat Card, Stepper, Paginator, Empty State, Auto Grid
-- History Timeline (feature `record-history`)
-- Tag Catalog Picker (feature `tag-catalog`)
+- History Timeline and Tag Catalog Picker (host `extend_registrations` + L3 `preview` feature)
 - Search Source Picker, Unified Field icons
 - Demo Status Pill (teaching example)
 

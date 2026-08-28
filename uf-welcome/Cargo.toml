@@ -32,7 +32,6 @@ inventory = { workspace = true, optional = true }
 
 valence = { workspace = true, optional = true }
 higgs = { workspace = true, optional = true }
-gauge = { workspace = true, optional = true, default-features = false }
 chrono = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 anyhow = { workspace = true, optional = true }
@@ -52,8 +51,8 @@ lazy-routes = []
 db-sqlite = ["valence/sqlite"]
 db-mem = ["valence/mem"]
 hydrate = ["leptos/hydrate", "uf-integrations/hydrate", "uf-product/hydrate", "uf-help/hydrate"]
-# Enable on L5 hosts that unify Gauge Chronon deps; wires `actor_can("WelcomeAdmin")`.
-admin-permissions = ["dep:gauge", "gauge/ssr"]
+# Marker: host wired `PermissionBackend` (Gauge) at bootstrap; no compile-time gauge dep.
+admin-permissions = []
 ssr = [
     "leptos/ssr",
     "leptos_meta/ssr",

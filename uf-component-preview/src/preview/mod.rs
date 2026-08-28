@@ -17,6 +17,7 @@
 mod catalog_nav;
 mod catalog_search;
 mod catalog_shell;
+pub mod extensions;
 pub mod fixtures;
 mod manual_registrations;
 mod nav;
@@ -32,6 +33,7 @@ mod registry_tests;
 pub use catalog_nav::PreviewCatalogNav;
 pub use catalog_search::PreviewCatalogSearch;
 pub use catalog_shell::PreviewCatalogShell;
+pub use extensions::extend_registrations;
 pub use nav::PreviewNav;
 pub use paths::preview_page;
 pub use registry::collect_preview_registrations;

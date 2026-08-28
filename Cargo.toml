@@ -147,9 +147,7 @@ photon-runtime = { path = "../../L0-upstream-cores/photon/photon-runtime", defau
 photon-leptos = { path = "../../L1-host-stack-kits/photon-leptos/photon-leptos", default-features = false }
 photon-axum = { path = "../../L1-host-stack-kits/photon-leptos/photon-axum", default-features = false }
 
-# Path pin until Gauge is published as a standalone git package. uf-product /
-# uf-integrations permission checks may still fail closed until wired end-to-end.
-gauge = { path = "../../L3-zone-products/gauge/gauge", default-features = false }
+# Permission platform types + host-pluggable backend; no L3 gauge compile edge.
 
 # In-repo
 uf-product = { path = "uf-product" }

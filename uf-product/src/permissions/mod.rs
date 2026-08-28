@@ -80,9 +80,16 @@
 //!
 //! # Runtime checks
 //!
-//! [`crate::routes::RequireAuthenticated`] and `#[server]` permission gates read
-//! these names, but Gauge evaluation is not wired yet: named permission checks
-//! **fail closed** (deny) until the host enables the `permissions` feature path.
+//! Hosts install a [`PermissionBackend`] via [`provide_permission_backend`] at
+//! shell bootstrap. [`require_permission`] and route gates **fail closed** when
+//! no backend is in context.
+
+mod backend;
+
+pub use backend::{
+    check_permission_by_name, has_permission, provide_permission_backend, require_permission,
+    use_permission_backend, PermissionBackend,
+};
 
 /// Convert app-specific permission enums into canonical string names.
 ///

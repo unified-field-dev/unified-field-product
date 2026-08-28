@@ -49,17 +49,11 @@ uf-product-macros = { workspace = true }
 higgs = { workspace = true, default-features = false, optional = true }
 valence = { workspace = true, default-features = false, optional = true }
 
-# Path pins so this workspace member resolves without fetching zone-product git remotes.
-record-history-leptos = { path = "../../../L3-zone-products/record-history/record-history-leptos", default-features = false, optional = true }
-tag-app = { path = "../../../L3-zone-products/tag/tag-app", default-features = false, optional = true }
-
 inventory = { workspace = true, optional = true }
 
 [features]
 default = []
 preview = []
-record-history = ["dep:record-history-leptos", "dep:valence", "record-history-leptos/preview"]
-tag-catalog = ["dep:tag-app", "tag-app/preview"]
 hydrate = [
     "preview",
     "leptos/hydrate",
@@ -74,7 +68,7 @@ hydrate = [
     "orbital-charts/hydrate",
     "orbital-tree/hydrate",
     "orbital-scheduler/hydrate",
-    # Keep record-history / tag-catalog off hydrate — they pull valence/sqlite → mio into wasm.
+    # L3 zone previews are host-merged via extend_registrations — not in hydrate graph.
     "orbital-base-components/hydrate",
 ]
 ssr = [

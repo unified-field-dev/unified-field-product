@@ -9,11 +9,18 @@ use component_preview_host::{shell, App};
 use leptos::config::get_configuration;
 use leptos_axum::{generate_route_list, LeptosRoutes};
 use tower_http::services::ServeDir;
+use uf_component_preview::preview::extend_registrations;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
     simple_logger::init_with_level(log::Level::Info).expect("logger");
     any_spawner::Executor::init_futures_executor().expect("futures executor");
+
+    #[cfg(feature = "zone-previews")]
+    {
+        extend_registrations(record_history_leptos::preview::all());
+        extend_registrations(tag_app::preview::all());
+    }
 
     let conf = get_configuration(None).expect("leptos config");
     let leptos_options = conf.leptos_options;

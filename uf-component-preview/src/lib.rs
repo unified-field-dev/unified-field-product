@@ -25,12 +25,11 @@
 //! | Feature | Effect |
 //! |---------|--------|
 //! | `preview` | Marks this crate as a preview consumer of Orbital / uf-product preview APIs. |
-//! | `record-history` | Pulls `record-history-leptos` preview registrations into the catalog (SSR graph only). |
-//! | `tag-catalog` | Pulls `tag-app` preview registrations into the catalog (SSR graph only). |
-//! | `hydrate` / `ssr` | Leptos client/server split. Hydrate keeps `record-history` / `tag-catalog` off so Valence/SQLite never enters WASM. |
+//! | `hydrate` / `ssr` | Leptos client/server split. L3 zone previews are host-merged via [`preview::extend_registrations`]. |
 //!
-//! Enable `record-history` and `tag-catalog` on the SSR host that builds the catalog
-//! binary (see `examples/component-preview-host`). Leave them off hydrate.
+//! Hosts that want History Timeline and Tag Catalog Picker in the catalog call
+//! `extend_registrations` with each L3 crate's `preview::all()` at startup (see
+//! `examples/component-preview-host` with feature `zone-previews`).
 //!
 //! ## Getting started
 //!
@@ -62,7 +61,7 @@
 //! |-------|-------|------|
 //! | Highlight | [Getting started](#getting-started) | Mount [`OrbitalComponentRoutes`] |
 //! | Mid | [`components::examples`] | Teaching `#[component_doc]` widget (`demo-status-pill`) |
-//! | Detailed | `examples/component-preview-host` | Full `/orbital` host; enable `record-history` / `tag-catalog` on SSR |
+//! | Detailed | `examples/component-preview-host` | Full `/orbital` host; enable `zone-previews` on SSR for L3 pages |
 //!
 //! ```bash
 //! cargo check -p component-preview-host --features ssr

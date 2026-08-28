@@ -93,27 +93,11 @@ pub fn expand_server(attr: TokenStream, input: TokenStream) -> TokenStream {
         || quote! {},
         |permission| {
             quote! {
-                #[cfg(feature = "ssr")]
-                {
-                    let __higgs_ctx = higgs::Higgs::from_request().await?;
-                    let __higgs_valence = __higgs_ctx.valence().map_err(|e| {
-                        leptos::prelude::ServerFnError::new(format!("Failed to build Valence: {e}"))
-                    })?;
-                    let __higgs_allowed = gauge::service::actor_can(&__higgs_valence, #permission)
-                        .await
-                        .map_err(|e| {
-                            leptos::prelude::ServerFnError::new(
-                                higgs::server_runtime::permission_check_failed_payload(#permission, &e.to_string())
-                            )
-                        })?;
-
-                    if !__higgs_allowed {
-                        return Err(leptos::prelude::ServerFnError::new(
-                            higgs::server_runtime::permission_denied_payload(#permission),
-                        ));
-                    }
-                }
+            #[cfg(feature = "ssr")]
+            {
+                uf_product::permissions::require_permission(#permission).await?;
             }
+                }
         },
     );
 
@@ -185,7 +169,10 @@ mod tests {
             out.contains("higgs :: server_runtime :: with_operation"),
             "expected higgs server_runtime with_operation: {out}"
         );
-        assert!(out.contains("actor_can"), "expected permission gate: {out}");
+        assert!(
+            out.contains("require_permission"),
+            "expected permission gate: {out}"
+        );
         assert!(
             out.contains("\"apps.view\""),
             "expected permission name: {out}"
