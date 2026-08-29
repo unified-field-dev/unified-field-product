@@ -9,10 +9,11 @@ use spectra::try_log_event_at;
 use tower_sessions::Session;
 use uf_product::telemetry::usage::{E2E_USAGE_VIEWER_SESSION_KEY, PAGE_VIEW_LOG_TABLE};
 
-use crate::e2e_permissions::E2E_PERMISSION_ALLOW_SESSION_KEY;
+use crate::e2e_permissions::{E2E_PERMISSION_ALLOW_FLAG, E2E_PERMISSION_ALLOW_SESSION_KEY};
 use crate::e2e_spectra::e2e_spectra;
 use crate::e2e_valence::e2e_valence;
 use crate::gate_demos::{write_e2e_auth_kind, E2eAuthKind};
+use std::sync::atomic::Ordering;
 use uf_welcome::E2E_WELCOME_ADMIN_SESSION_KEY;
 
 #[derive(Debug, Deserialize)]
@@ -97,11 +98,13 @@ pub async fn seed_data(
     }
 
     if body.permission_allow {
+        E2E_PERMISSION_ALLOW_FLAG.store(true, Ordering::SeqCst);
         session
             .insert(E2E_PERMISSION_ALLOW_SESSION_KEY, true)
             .await
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     } else {
+        E2E_PERMISSION_ALLOW_FLAG.store(false, Ordering::SeqCst);
         session
             .remove::<bool>(E2E_PERMISSION_ALLOW_SESSION_KEY)
             .await

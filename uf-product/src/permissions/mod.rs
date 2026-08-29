@@ -88,8 +88,8 @@ mod backend;
 
 #[cfg(feature = "ssr")]
 pub use backend::{
-    has_permission, provide_permission_backend, require_permission, use_permission_backend,
-    PermissionBackend,
+    eval_permission_by_name, has_permission, provide_permission_backend, require_permission,
+    use_permission_backend, PermissionBackend,
 };
 
 pub use backend::check_permission_by_name;

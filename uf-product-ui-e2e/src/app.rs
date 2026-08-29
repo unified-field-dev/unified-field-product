@@ -48,6 +48,10 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
+    #[cfg(feature = "ssr")]
+    {
+        crate::wire_e2e_permissions();
+    }
     provide_shell_auth_menu(|| view! { <HarnessAuthMenu /> });
     uf_help::ensure_linked();
     uf_appearance::ensure_linked();

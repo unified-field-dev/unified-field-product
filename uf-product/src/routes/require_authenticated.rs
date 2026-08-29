@@ -1,6 +1,9 @@
 //! Auth-aware route guards and access-gate dialog UI.
 
+#[cfg(not(feature = "ssr"))]
 use crate::permissions::check_permission_by_name;
+#[cfg(feature = "ssr")]
+use crate::permissions::eval_permission_by_name;
 use crate::{AuthContext, AuthSession};
 use leptos::prelude::*;
 use leptos::tachys::view::any_view::{AnyView, IntoAny};
@@ -13,10 +16,17 @@ use super::referer::{auth_signin_href, auth_signup_href};
 use crate::components::{EMPTYSTATE_LOCK_ILLUSTRATION, EMPTYSTATE_SIGNIN_ILLUSTRATION};
 use crate::primitives::{Button, ButtonAppearance};
 
-// Gauge-backed checks use the host-provided PermissionBackend via the
-// `CheckPermissionByName` server fn. Fail closed when unwired.
+// Prefer direct backend eval on SSR (same request context as
+// `provide_permission_backend`). Hydrate POSTs via `CheckPermissionByName`.
 async fn has_permission_by_name(name: String) -> Result<bool, ServerFnError> {
-    check_permission_by_name(name).await
+    #[cfg(feature = "ssr")]
+    {
+        return eval_permission_by_name(&name).await;
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        check_permission_by_name(name).await
+    }
 }
 
 fn resolve_permission_id_by_name(

@@ -27,17 +27,14 @@ pub fn use_permission_backend() -> Option<Arc<dyn PermissionBackend>> {
 /// Fail-closed gate for server functions and admin paths.
 #[cfg(feature = "ssr")]
 pub async fn require_permission(permission_name: &str) -> Result<(), ServerFnError> {
-    let Some(backend) = use_permission_backend() else {
-        return Err(ServerFnError::new(
-            higgs::server_runtime::permission_denied_payload(permission_name),
-        ));
-    };
-    let allowed = backend.has_permission(permission_name).await.map_err(|e| {
-        ServerFnError::new(higgs::server_runtime::permission_check_failed_payload(
-            permission_name,
-            &e.to_string(),
-        ))
-    })?;
+    let allowed = eval_permission_by_name(permission_name)
+        .await
+        .map_err(|e| {
+            ServerFnError::new(higgs::server_runtime::permission_check_failed_payload(
+                permission_name,
+                &e.to_string(),
+            ))
+        })?;
     if !allowed {
         return Err(ServerFnError::new(
             higgs::server_runtime::permission_denied_payload(permission_name),
@@ -49,36 +46,39 @@ pub async fn require_permission(permission_name: &str) -> Result<(), ServerFnErr
 /// Soft check: returns false when no backend is installed or the check fails.
 #[cfg(feature = "ssr")]
 pub async fn has_permission(permission_name: &str) -> bool {
-    let Some(backend) = use_permission_backend() else {
-        return false;
-    };
-    backend
-        .has_permission(permission_name)
+    eval_permission_by_name(permission_name)
         .await
         .unwrap_or(false)
 }
 
-/// Route-guard helper: fail closed when no backend is wired.
+/// Evaluate a named permission using the installed [`PermissionBackend`].
 ///
-/// Callable from SSR and hydrate (POST to the host). Hosts must
-/// [`provide_permission_backend`] in the Leptos request context.
+/// Prefer this on the SSR render path so route guards share the same Leptos
+/// request context as [`provide_permission_backend`]. Hydrate clients should
+/// call [`check_permission_by_name`] (server fn).
+#[cfg(feature = "ssr")]
+pub async fn eval_permission_by_name(permission_name: &str) -> Result<bool, ServerFnError> {
+    let name = permission_name.trim();
+    if name.is_empty() {
+        return Ok(false);
+    }
+    let Some(backend) = use_permission_backend() else {
+        return Ok(false);
+    };
+    backend.has_permission(name).await
+}
+
+/// Route-guard helper for hydrate / remote calls: fail closed when unwired.
 ///
 /// # Errors
 ///
-/// Returns [`ServerFnError`] when the backend check itself fails (mapped from
-/// backend errors). Missing backend or empty name yields [`Ok`]`(false)`.
+/// Returns [`ServerFnError`] when the backend check itself fails. Missing
+/// backend or empty name yields [`Ok`]`(false)`.
 #[server(CheckPermissionByName)]
 pub async fn check_permission_by_name(permission_name: String) -> Result<bool, ServerFnError> {
     #[cfg(feature = "ssr")]
     {
-        let name = permission_name.trim();
-        if name.is_empty() {
-            return Ok(false);
-        }
-        let Some(backend) = use_permission_backend() else {
-            return Ok(false);
-        };
-        return backend.has_permission(name).await;
+        return eval_permission_by_name(&permission_name).await;
     }
     #[cfg(not(feature = "ssr"))]
     {

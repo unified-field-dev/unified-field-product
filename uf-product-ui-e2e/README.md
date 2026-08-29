@@ -80,8 +80,9 @@ Harness seed: `POST /api/test/seed-data` with `{ "auth": "authenticated_verified
 seed mem Spectra for usage-card fixtures (one process-global Spectra; isolate via
 viewer keys). Optional `welcome_admin: true` sets `uf_e2e_welcome_admin` so featured
 mutations use the harness Valence seam (session flag; not Gauge `PermissionBackend`).
-Optional `permission_allow: true` sets `uf_e2e_permission_allow` so the harness
-`PermissionBackend` allows `e2e.permission.allow` (still not live Gauge `actor_can`).
+Optional `permission_allow: true` sets `uf_e2e_permission_allow` and a process-global
+flag so the harness `PermissionBackend` allows `e2e.permission.allow` (still not live
+Gauge `actor_can`).
 
 ## Runtime scope
 
