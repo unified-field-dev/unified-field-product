@@ -7,6 +7,13 @@ use uf_product::{provide_auth_context, provide_auth_dialog_controller};
 #[cfg(feature = "ssr")]
 const E2E_AUTH_KEY: &str = "e2e_auth_kind";
 
+/// Higgs / Valence record id for the verified e2e user (`table:id`).
+#[cfg(feature = "ssr")]
+pub const E2E_VERIFIED_SESSION_USER: &str = "user:e2e-user";
+/// Higgs / Valence record id for the unverified e2e user (`table:id`).
+#[cfg(feature = "ssr")]
+pub const E2E_UNVERIFIED_SESSION_USER: &str = "user:e2e-unverified";
+
 /// E2e session kinds stored under [`E2E_AUTH_KEY`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum E2eAuthKind {
@@ -32,6 +39,16 @@ impl E2eAuthKind {
             "authenticated_verified" => Self::AuthenticatedVerified,
             "authenticated_unverified" => Self::AuthenticatedUnverified,
             _ => Self::Anonymous,
+        }
+    }
+
+    /// Higgs `SessionSnapshot` user id (`table:id`), when signed in.
+    #[cfg(feature = "ssr")]
+    pub const fn session_user_id(self) -> Option<&'static str> {
+        match self {
+            Self::Anonymous => None,
+            Self::AuthenticatedVerified => Some(E2E_VERIFIED_SESSION_USER),
+            Self::AuthenticatedUnverified => Some(E2E_UNVERIFIED_SESSION_USER),
         }
     }
 
@@ -128,4 +145,27 @@ pub async fn write_e2e_auth_kind(
         .insert(E2E_AUTH_KEY, kind.as_str().to_string())
         .await
         .map_err(|e| anyhow::anyhow!(e.to_string()))
+}
+
+/// Mirror the e2e tower-session into `higgs_identity::SessionSnapshot`.
+#[cfg(feature = "ssr")]
+pub async fn inject_e2e_session_snapshot(
+    session: tower_sessions::Session,
+    mut req: axum::extract::Request,
+    next: axum::middleware::Next,
+) -> axum::response::Response {
+    use higgs_identity::SessionSnapshot;
+
+    let kind = session
+        .get::<String>(E2E_AUTH_KEY)
+        .await
+        .ok()
+        .flatten()
+        .map(|raw| E2eAuthKind::parse(&raw))
+        .unwrap_or(E2eAuthKind::Anonymous);
+    if let Some(user_id) = kind.session_user_id() {
+        req.extensions_mut()
+            .insert(SessionSnapshot::new(user_id, b"e2e-auth-hash"));
+    }
+    next.run(req).await
 }

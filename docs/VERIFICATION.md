@@ -36,6 +36,7 @@ Additional SSR checks (not in the default CI `test` job):
 cargo check -p uf-help -p uf-appearance --features ssr
 cargo check -p uf-integrations --features ssr
 cargo check -p uf-integrations --no-default-features --features ssr
+cargo check -p uf-notifications --features ssr
 ```
 
 Optional SSR helpers in `uf-product` (heavier graph):
@@ -82,7 +83,8 @@ cargo dylint --all -p uf-integrations --no-deps -- --features hydrate
 ## Layer 2 — UI e2e
 
 Product operator surfaces (shell, app-bar utilities, search, coming-soon/404, auth
-gates, `/apps`, `/welcome`). Scenario IDs live in
+gates, `/apps`, `/welcome`) plus **notifications** inbox/bell/Photon WS
+(`end2end/tests/notifications.spec.ts`). Scenario IDs live in
 [`uf-product-ui-e2e/README.md`](../uf-product-ui-e2e/README.md).
 CI job `e2e` runs the same commands.
 
@@ -94,17 +96,18 @@ cargo leptos end-to-end --project uf-product-ui-e2e
 
 ### Runtime scope (what this host boots)
 
-`uf-product-ui-e2e` is a library-owned Axum + Leptos host with **mem Valence**, **mem Spectra**, and a **session stub** for auth gates. That matches what product crates call.
+`uf-product-ui-e2e` is a library-owned Axum + Leptos host with **mem Valence**, **mem Spectra**, a **session stub** for auth gates, and **in-process Photon** for `/ws/notifications` (notifications suite only).
 
 | Runtime | Product feature need? | This host |
 |---------|------------------------|-----------|
-| Valence | Yes | Mem, in context |
+| Valence | Yes | Mem / harness Sqlite for notifications seed |
 | Spectra | Yes (usage / page views) | Mem |
 | Higgs | Yes on production hosts | Stubbed (session + harness Valence) |
 | Gauge (`PermissionBackend`) | Yes for real permission allow | Harness backend + `permission_allow` session flag (`e2e.permission.allow` / deny) |
-| Chronon / Boson / Photon | No (product never calls them) | Not installed |
+| Photon | Notifications unread WS only | In-process `/ws/notifications` |
+| Chronon / Boson | No | Not installed |
 
-Chronon / Boson / Photon host composition belongs in L5 IsolatedLab (`uf-embedded-e2e`, `uf-site-e2e`, …). Real Gauge `actor_can` belongs with gauge / L5 hosts that call `wire_gauge_permissions()`. This host’s harness `PermissionBackend` covers gate allow/deny UI only. Do not add Chronon/Boson/Photon here to “complete” product e2e.
+Chronon / Boson (and broader Photon topics) still belong in L5 IsolatedLab when testing host composition. Real Gauge `actor_can` belongs with gauge / L5 hosts that call `wire_gauge_permissions()`. This host’s harness `PermissionBackend` covers gate allow/deny UI only.
 
 ## Documentation gates
 
@@ -116,7 +119,7 @@ broken-link **denial**:
 |---------|----------|------------|
 | `uf-product-macros`, `uf-codegen` | (none) | yes (`RUSTDOCFLAGS`) |
 | `uf-search-core`, `uf-product`, `uf-integrations` | `ssr` | yes (`RUSTDOCFLAGS`) |
-| `uf-help`, `uf-appearance`, `uf-apps`, `uf-welcome` | (none) | optional, no deny |
+| `uf-help`, `uf-appearance`, `uf-apps`, `uf-welcome`, `uf-notifications` | (none / `ssr`) | optional, no deny |
 | `uf-component-preview` | `ssr` | optional, no deny |
 
 ```bash
@@ -140,7 +143,7 @@ RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links" cargo doc \
 Optional app / preview crates (no `RUSTDOCFLAGS` deny):
 
 ```bash
-cargo doc -p uf-apps -p uf-welcome -p uf-help -p uf-appearance --no-deps
+cargo doc -p uf-apps -p uf-welcome -p uf-help -p uf-appearance -p uf-notifications --no-deps
 cargo doc -p uf-component-preview --features ssr --no-deps
 ```
 

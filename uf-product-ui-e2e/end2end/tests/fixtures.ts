@@ -11,6 +11,13 @@ export type SeedPageView = {
   age_secs?: number;
 };
 
+export type SeedNotification = {
+  title: string;
+  message?: string;
+  kind?: string;
+  url?: string;
+};
+
 export async function seedAuth(
   page: Page,
   auth: SeedAuthKind,
@@ -22,6 +29,10 @@ export async function seedAuth(
     welcome_admin?: boolean;
     /** Allow `e2e.permission.allow` via harness PermissionBackend. */
     permission_allow?: boolean;
+    /** Notifications to mint (System Valence); empty clears the bell when not appending. */
+    notifications?: SeedNotification[];
+    /** Keep prior minted rows and append (Photon live-push probes). */
+    append?: boolean;
     /**
      * When true, clear Help tour localStorage so spotlight scenarios can assert
      * first-visit behavior. Default false: mark seeded steps seen so other
@@ -116,6 +127,24 @@ export async function seedAuth(
             spotlight: null,
             replay: false,
           },
+          {
+            route: "/notifications",
+            feature_highlight: "notifications-bell",
+            spotlight: "notification-bell",
+            replay: false,
+          },
+          {
+            route: "/notifications",
+            feature_highlight: "notifications-inbox",
+            spotlight: "notifications-inbox-page",
+            replay: false,
+          },
+          {
+            route: "/notifications",
+            feature_highlight: "notifications-nav",
+            spotlight: "nav-notifications-inbox",
+            replay: false,
+          },
         ]),
       );
     } catch {
@@ -130,6 +159,8 @@ export async function seedAuth(
       welcome_admin: opts?.welcome_admin ?? false,
       permission_allow: opts?.permission_allow ?? false,
       page_views: opts?.page_views ?? [],
+      notifications: opts?.notifications ?? [],
+      append: opts?.append ?? false,
     },
   });
   expect(res.ok()).toBeTruthy();
@@ -141,7 +172,32 @@ export async function seedAuth(
     permission_allow?: boolean;
     page_views: number;
     recent_preview?: string[];
+    minted?: number;
+    notification_ids?: string[];
+    append?: boolean;
   }>;
+}
+
+/** Read numeric unread badge from the bell container (0 when absent). */
+export async function readBellBadgeCount(page: Page): Promise<number> {
+  const region = page.getByTestId("notification-bell-container");
+  const spans = region.locator("span");
+  const n = await spans.count();
+  for (let i = 0; i < n; i++) {
+    const text = ((await spans.nth(i).textContent()) ?? "").trim();
+    if (/^\d+$/.test(text)) {
+      return parseInt(text, 10);
+    }
+  }
+  return 0;
+}
+
+/** Open the notification bell dropdown menu. */
+export async function openBellDropdown(page: Page) {
+  await page.getByTestId("notification-bell").getByRole("button").click();
+  await expect(page.getByText("Notifications", { exact: true })).toBeVisible({
+    timeout: 30_000,
+  });
 }
 
 /** Wait until Orbital boot overlay dismisses (WASM hydrate + `hide_boot_loader`). */

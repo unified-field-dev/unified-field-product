@@ -35,6 +35,8 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
     provide_shell_auth_menu(|| view! { <span data-testid="demo-auth-menu">"Demo user"</span> });
     // Link offering inventory (help/appearance via uf-integrations `full`; apps via this dep).
+    // `offering-notifications` is also in `full`; depend on `uf-notifications` in hosts that
+    // want HostNotificationBell filled via inventory (this chrome host leaves the slot empty).
     uf_help::ensure_linked();
     uf_appearance::ensure_linked();
     uf_apps::ensure_app_bar_linked();

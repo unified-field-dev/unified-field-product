@@ -758,15 +758,4 @@ test.describe("auth-and-notifications-routes", () => {
     await expect(page).toHaveURL(/\/auth\/signin\/?/, { timeout: 60_000 });
     await expect(page.getByText("Coming Soon", { exact: true })).toHaveCount(0);
   });
-
-  test("pw-notifications-inbox-when-signed-in", async ({ page }) => {
-    await seedAuth(page, "authenticated_verified");
-    await page.goto("/notifications", { waitUntil: "domcontentloaded" });
-    await waitForHydrated(page);
-    await expect(page.getByTestId("notifications-inbox-page")).toBeVisible({
-      timeout: 60_000,
-    });
-    await expect(page.getByTestId("nav-notifications-inbox")).toBeVisible();
-    await expect(page.getByText("Coming Soon", { exact: true })).toHaveCount(0);
-  });
 });

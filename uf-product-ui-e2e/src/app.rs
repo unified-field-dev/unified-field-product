@@ -1,4 +1,4 @@
-//! Routes that mount product shell / apps / welcome for Playwright.
+//! Routes that mount product shell / apps / welcome / notifications for Playwright.
 
 use leptos::prelude::*;
 use leptos_meta::*;
@@ -9,6 +9,7 @@ use uf_integrations::{
     provide_shell_auth_menu, HostAuthMenu, ShellAppBar, ShellAuthMenu, ShellLeftNav,
     UnifiedFieldAppBar, UnifiedFieldShellLayout,
 };
+use uf_notifications::NotificationsRoutes;
 use uf_product::components::{
     Navigation, NavigationBody, NavigationConfig, NavigationLink, NavigationMaterial,
 };
@@ -37,6 +38,12 @@ static E2E_ROUTE_TABLE: &[UfAppRouteEntry] = &[
         route_prefix: "/apps",
         brand_seed: "#2d6a4f",
     },
+    UfAppRouteEntry {
+        app_id: "notifications",
+        app_name: "Notifications",
+        route_prefix: "/notifications",
+        brand_seed: "#5c4d7a",
+    },
 ];
 
 /// SSR document shell.
@@ -51,6 +58,7 @@ pub fn App() -> impl IntoView {
     #[cfg(feature = "ssr")]
     {
         crate::wire_e2e_permissions();
+        provide_context(crate::e2e_higgs_config());
     }
     provide_shell_auth_menu(|| view! { <HarnessAuthMenu /> });
     uf_help::ensure_linked();
@@ -58,6 +66,8 @@ pub fn App() -> impl IntoView {
     uf_apps::ensure_app_bar_linked();
     uf_apps::ensure_help_linked();
     uf_welcome::ensure_help_linked();
+    uf_notifications::ensure_notification_bell_linked();
+    uf_notifications::ensure_help_steps_linked();
     crate::help_steps::ensure_help_steps_linked();
 
     view! {
@@ -79,6 +89,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("404") view=NotFoundDemoPage />
                         <UfAppsRoutes />
                         <UfWelcomeRoutes />
+                        <NotificationsRoutes />
                     </Routes>
                 </Router>
             </E2eAuthProvider>
@@ -107,6 +118,7 @@ fn ChromeShell() -> impl IntoView {
                         <NavigationMaterial slot />
                         <NavigationBody slot>
                             <NavigationLink path="/" value="/" icon=icondata::AiHomeOutlined exact=true test_id="nav-home">"Home"</NavigationLink>
+                            <NavigationLink path="/notifications" value="/notifications" icon=icondata::AiInboxOutlined test_id="nav-notifications-inbox">"Inbox"</NavigationLink>
                             <NavigationLink path="/coming-soon" value="/coming-soon" icon=icondata::AiClockCircleOutlined test_id="nav-coming-soon">"Coming soon"</NavigationLink>
                             <NavigationLink path="/404" value="/404" icon=icondata::AiFileUnknownOutlined test_id="nav-not-found">"Not found"</NavigationLink>
                             <NavigationLink path="/utilities-override" value="/utilities-override" icon=icondata::AiToolOutlined test_id="nav-utilities-override">"Utilities override"</NavigationLink>

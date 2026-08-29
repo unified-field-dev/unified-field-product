@@ -11,6 +11,7 @@ members = [
     "uf-appearance",
     "uf-apps",
     "uf-welcome",
+    "uf-notifications",
     "uf-component-preview",
     "examples/shell-chrome-host",
     "examples/component-preview-host",
@@ -162,6 +163,10 @@ uf-search-core = { path = "uf-search-core" }
 # into uf-product-ui-e2e and break single-WASM hydrate).
 uf-apps = { path = "uf-apps", default-features = false }
 uf-welcome = { path = "uf-welcome", default-features = false }
+uf-notifications = { path = "uf-notifications", default-features = false }
+# Domain API/core (sibling repo under L2-product-platform)
+uf-notifications-api = { path = "../uf-notifications/uf-notifications-api", default-features = false }
+uf-notifications-core = { path = "../uf-notifications/uf-notifications-core", default-features = false }
 uf-component-preview = { path = "uf-component-preview" }
 # UI / styling
 icondata = { version = "0.4.0", default-features = false, features = ["ant-design-icons", "box-icons", "lucide"] }
@@ -186,6 +191,7 @@ uuid = { version = "1", features = ["v4", "serde"] }
 url = "2"
 dashmap = "5"
 log = "0.4"
+tracing = { version = "0.1", default-features = false, features = ["std", "attributes"] }
 
 [[workspace.metadata.leptos]]
 name = "shell-chrome-host"
@@ -246,6 +252,11 @@ uf-product = { path = "uf-product" }
 uf-integrations = { path = "uf-integrations" }
 uf-product-macros = { path = "uf-product-macros" }
 uf-search-core = { path = "uf-search-core" }
+uf-notifications = { path = "uf-notifications" }
+
+[patch."https://github.com/deathbreakfast/uf-notifications"]
+uf-notifications-core = { path = "../uf-notifications/uf-notifications-core" }
+uf-notifications-api = { path = "../uf-notifications/uf-notifications-api" }
 
 [patch."https://github.com/unified-field-dev/valence"]
 uf-valence = { path = "../../L0-upstream-cores/valence/valence" }
@@ -285,3 +296,17 @@ orbital-scheduler = { path = "../../L0-upstream-cores/orbital/orbital-scheduler"
 orbital-motion = { path = "../../L0-upstream-cores/orbital/orbital-motion" }
 orbital-style = { path = "../../L0-upstream-cores/orbital/orbital-style" }
 orbital-data = { path = "../../L0-upstream-cores/orbital/orbital-data" }
+uf-photon = { path = "../../L0-upstream-cores/photon/photon" }
+uf-photon-core = { path = "../../L0-upstream-cores/photon/photon-core" }
+photon-runtime = { path = "../../L0-upstream-cores/photon/photon-runtime" }
+photon-backend = { path = "../../L0-upstream-cores/photon/photon-backend" }
+photon-macros = { path = "../../L0-upstream-cores/photon/photon-macros" }
+photon-telemetry = { path = "../../L0-upstream-cores/photon/photon-telemetry" }
+photon-axum = { path = "../../L1-host-stack-kits/photon-leptos/photon-axum" }
+photon-leptos = { path = "../../L1-host-stack-kits/photon-leptos/photon-leptos" }
+photon-leptos-macros = { path = "../../L1-host-stack-kits/photon-leptos/photon-leptos-macros" }
+
+[patch."https://github.com/unified-field-dev/photon-leptos"]
+photon-axum = { path = "../../L1-host-stack-kits/photon-leptos/photon-axum" }
+photon-leptos = { path = "../../L1-host-stack-kits/photon-leptos/photon-leptos" }
+photon-leptos-macros = { path = "../../L1-host-stack-kits/photon-leptos/photon-leptos-macros" }

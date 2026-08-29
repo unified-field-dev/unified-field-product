@@ -9,8 +9,10 @@ search picker, and standard empty pages.
 - **App bar** — branding, breadcrumbs, search slot, and a generic utilities slot
   (default = Help / Apps / Appearance offerings when `full` is enabled)
 - **Offerings** — Cargo features `offering-help`, `offering-apps`,
-  `offering-appearance`, and `full` (default). `offering-apps` is a marker: also
-  depend on [`uf-apps`](../uf-apps/) so the Apps button registers.
+  `offering-appearance`, `offering-notifications`, and `full` (default).
+  `offering-apps` and `offering-notifications` are markers: also depend on
+  [`uf-apps`](../uf-apps/) / [`uf-notifications`](../uf-notifications/) so
+  inventory registers the Apps button and shell bell.
 - **Shell layout** — Orbital `Layout` with app-bar / left-nav slots and permission toast bus. With a left nav, the shell uses `SidebarPresentation::Auto` (drawer below `Md`, inline column on wide viewports) and starts with the sidebar closed.
 - **Search** — `SearchSourcePicker` over `uf-search-core` keys and items
 - **Pages** — coming-soon and not-found surfaces

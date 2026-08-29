@@ -24,8 +24,10 @@ uf-product = { git = "https://github.com/unified-field-dev/unified-field-product
 - **Search contracts** — client DTOs and SSR provider registry (`uf-search-core`)
 - **Session and appearance** — host session bridge, light/dark/brand preferences, page-view telemetry (`uf-product`)
 - **Design system** — Orbital primitives and components available through `uf-product` for app crates
-- **Product apps** — signed-in welcome (`uf-welcome`), apps directory (`uf-apps`), component preview (`uf-component-preview`)
-- **Optional offerings** — Help and Appearance app-bar utilities (`uf-help`, `uf-appearance`)
+- **Product apps** — signed-in welcome (`uf-welcome`), apps directory (`uf-apps`),
+  notifications inbox (`uf-notifications`), component preview (`uf-component-preview`)
+- **Optional offerings** — Help, Appearance, and notification-bell markers
+  (`uf-help`, `uf-appearance`, `offering-notifications`)
 
 For types and task indexes, open the crate docs:
 `cargo doc -p uf-product --features ssr --open` or
@@ -58,6 +60,7 @@ uf-product         (session, guards, registry, appearance, design-system APIs)
 | [`uf-codegen`](uf-codegen/) | Build-time scan of `uf_app!` into generated route tables |
 | [`uf-apps`](uf-apps/) | Apps directory UI at `/apps` |
 | [`uf-welcome`](uf-welcome/) | Signed-in welcome landing at `/welcome` |
+| [`uf-notifications`](uf-notifications/) | Bell + inbox UI; domain API/core from uf-notifications repo |
 | [`uf-component-preview`](uf-component-preview/) | Dev catalog at `/orbital` |
 | [`uf-help`](uf-help/) | Optional Help app-bar offering (`offering-help` / `full`) |
 | [`uf-appearance`](uf-appearance/) | Optional Appearance app-bar offering (`offering-appearance` / `full`) |

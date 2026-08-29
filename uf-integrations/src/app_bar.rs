@@ -170,6 +170,12 @@ pub fn DefaultAppBarUtilities() -> impl IntoView {
         // enable `offering-apps` / `full` should also depend on `uf-apps` so its
         // inventory row is linked (shell-chrome-host and product hosts already do).
     }
+    #[cfg(feature = "offering-notifications")]
+    {
+        // `uf-notifications` is not a dep here (cycle with shell). Hosts that
+        // enable `offering-notifications` / `full` should depend on
+        // `uf-notifications` so `HostNotificationBell` inventory fallback links.
+    }
 
     let items = collect_app_bar_utilities();
     view! {

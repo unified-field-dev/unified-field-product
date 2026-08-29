@@ -22,8 +22,9 @@
 //!   query the per-user workspace content index from the app bar. [Get started](#workspace-search)
 //! - **App bar** — [`UnifiedFieldAppBar`] composes branding, breadcrumbs
 //!   ([`BreadcrumbLink`]), workspace search slots, and [`AppBarUtilities`].
-//! - **Notification bell slot** — [`provide_shell_notification_bell`] and
-//!   [`HostNotificationBell`] mirror the auth-menu slot pattern for alerts.
+//! - **Notification bell slot** — [`provide_shell_notification_bell`] overrides;
+//!   with `offering-notifications`, [`HostNotificationBell`] falls back to
+//!   inventory from a linked `uf-notifications` crate.
 //! - **Placeholder pages** — [`UnifiedFieldComingSoonPage`], [`coming_soon_fill_for_path`],
 //!   and [`UnifiedFieldNotFoundPage`] for routes that are not built yet.
 //!
@@ -95,14 +96,14 @@
 //! use leptos::prelude::*;
 //! use lepton_shell::AppBarUserMenu;
 //! use uf_integrations::{
-//!     provide_shell_auth_menu, provide_shell_notification_bell, HostAuthMenu, ShellAppBar,
-//!     ShellAuthMenu, UnifiedFieldAppBar, UnifiedFieldShellLayout,
+//!     provide_shell_auth_menu, HostAuthMenu, ShellAppBar, ShellAuthMenu, UnifiedFieldAppBar,
+//!     UnifiedFieldShellLayout,
 //! };
-//! use uf_notifications::NotificationBell;
 //!
 //! // Once at host boot, before routed pages mount:
 //! provide_shell_auth_menu(|| view! { <AppBarUserMenu /> });
-//! provide_shell_notification_bell(|| view! { <NotificationBell /> });
+//! // With `offering-notifications` + a linked `uf-notifications` dep, HostNotificationBell
+//! // fills via inventory. Call provide_shell_notification_bell only to override.
 //!
 //! #[component]
 //! fn AppShell(children: Children) -> impl IntoView {
@@ -124,6 +125,9 @@
 //! On success the shell renders [`UnifiedFieldAppBar`] chrome with your
 //! `AppBarUserMenu` in the auth slot. Omit [`ShellAuthMenu`] when the host does
 //! not call [`provide_shell_auth_menu`]; [`HostAuthMenu`] then renders nothing.
+//! Link `uf-notifications` (and keep `offering-notifications` / `full`) for the
+//! default bell in [`HostNotificationBell`], or override with
+//! [`provide_shell_notification_bell`].
 //!
 //! ## Search source picker
 //!
@@ -193,7 +197,8 @@
 //! | `offering-help` | Help tour widget in the default utilities pack. |
 //! | `offering-apps` | Marker: host should link `uf-apps` so its Apps launcher appears. |
 //! | `offering-appearance` | Appearance control in the default utilities pack. |
-//! | `full` | All three offering flags above. |
+//! | `offering-notifications` | Marker: host should link `uf-notifications` so inventory fills [`HostNotificationBell`]. |
+//! | `full` | All four offering flags above. |
 //! | `ssr` | Server fns for workspace search and search-source registry on SSR builds. |
 //! | `hydrate` | Client hydration for shell components and search UI. |
 //! | `permissions` | Placeholder until Gauge is git-standalone; gates stay fail-closed. |
@@ -242,7 +247,9 @@ pub use app_bar::{
 pub use coming_soon_page::{coming_soon_fill_for_path, UnifiedFieldComingSoonPage};
 pub use host_auth_menu::{provide_shell_auth_menu, HostAuthMenu, ShellAuthMenuFactory};
 pub use host_notification_bell::{
-    provide_shell_notification_bell, HostNotificationBell, ShellNotificationBellFactory,
+    collect_shell_notification_bell, provide_shell_notification_bell,
+    register_shell_notification_bell, HostNotificationBell, ShellNotificationBellContribution,
+    ShellNotificationBellFactory,
 };
 pub use not_found_page::UnifiedFieldNotFoundPage;
 pub use search_source_picker::SearchSourcePicker;
