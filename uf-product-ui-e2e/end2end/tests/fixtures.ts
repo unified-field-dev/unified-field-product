@@ -20,6 +20,8 @@ export async function seedAuth(
     usage_viewer?: string;
     /** E2e welcome-admin session flag (no Gauge Chronon on this host). */
     welcome_admin?: boolean;
+    /** Allow `e2e.permission.allow` via harness PermissionBackend. */
+    permission_allow?: boolean;
     /**
      * When true, clear Help tour localStorage so spotlight scenarios can assert
      * first-visit behavior. Default false: mark seeded steps seen so other
@@ -126,6 +128,7 @@ export async function seedAuth(
       auth,
       usage_viewer: opts?.usage_viewer,
       welcome_admin: opts?.welcome_admin ?? false,
+      permission_allow: opts?.permission_allow ?? false,
       page_views: opts?.page_views ?? [],
     },
   });
@@ -135,6 +138,7 @@ export async function seedAuth(
     auth: string;
     usage_viewer?: string;
     welcome_admin?: boolean;
+    permission_allow?: boolean;
     page_views: number;
     recent_preview?: string[];
   }>;

@@ -268,6 +268,10 @@
 //! ```
 //!
 //! The manifest exposes one domain with the `counter.admin.set` permission name.
+//! Names are stable for routes and server gates, but Valence rows appear only
+//! after a host calls Gauge `sync_permission_manifests` (see that crate’s
+//! rustdoc guide **App permission manifest sync**). Runtime checks still fail
+//! closed until a `PermissionBackend` is wired.
 //!
 //! ## Workspace content search
 //!

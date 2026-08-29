@@ -485,6 +485,25 @@ test.describe("pw-auth-gates", () => {
     await expect(page.getByRole("dialog")).toBeVisible({ timeout: 60_000 });
     await expect(page.getByText("Permission required")).toBeVisible();
   });
+
+  test("pw-auth-gate-permission-allow-happy", async ({ page }) => {
+    await seedAuth(page, "authenticated_verified", { permission_allow: true });
+    await page.goto("/gate/permission-allow");
+    await waitForHydrated(page);
+    await expect(page.getByTestId("gate-permission-allow-content")).toBeVisible({
+      timeout: 60_000,
+    });
+    await expect(page.getByTestId("permission-required-empty-state")).toHaveCount(0);
+  });
+
+  test("pw-auth-gate-permission-request-redirect-sad", async ({ page }) => {
+    await seedAuth(page, "authenticated_verified");
+    await page.goto("/gate/permission");
+    await waitForHydrated(page);
+    await expect(page.getByTestId("permission-required-empty-state")).toBeAttached();
+    await page.getByRole("button", { name: "Request Permission" }).click();
+    await expect(page).toHaveURL(/\/permission\/permissions\/?$/, { timeout: 60_000 });
+  });
 });
 
 test.describe("pw-apps", () => {

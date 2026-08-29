@@ -13,15 +13,10 @@ use super::referer::{auth_signin_href, auth_signup_href};
 use crate::components::{EMPTYSTATE_LOCK_ILLUSTRATION, EMPTYSTATE_SIGNIN_ILLUSTRATION};
 use crate::primitives::{Button, ButtonAppearance};
 
-// Gauge-backed checks use the host-provided PermissionBackend. Fail closed when unwired.
-#[cfg(feature = "ssr")]
+// Gauge-backed checks use the host-provided PermissionBackend via the
+// `CheckPermissionByName` server fn. Fail closed when unwired.
 async fn has_permission_by_name(name: String) -> Result<bool, ServerFnError> {
     check_permission_by_name(name).await
-}
-
-#[cfg(not(feature = "ssr"))]
-fn has_permission_by_name(_name: String) -> std::future::Ready<Result<bool, ServerFnError>> {
-    std::future::ready(Ok(false))
 }
 
 fn resolve_permission_id_by_name(
@@ -43,17 +38,6 @@ mod permission_gate_tests {
     //! Named gates must fail closed while Gauge is not wired as a git dep.
 
     use leptos::prelude::ServerFnError;
-
-    #[tokio::test]
-    async fn has_permission_by_name_fails_closed_without_feature() {
-        let allowed = super::has_permission_by_name("anything".into())
-            .await
-            .expect("ready");
-        assert!(
-            !allowed,
-            "without Gauge permissions, gates must deny rather than allow"
-        );
-    }
 
     #[test]
     fn permission_check_allows_only_explicit_true_happy_path() {

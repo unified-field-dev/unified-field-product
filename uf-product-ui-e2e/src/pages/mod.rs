@@ -10,7 +10,7 @@ mod utilities_override;
 mod workspace_search_hit;
 
 pub use coming_soon::ComingSoonDemoPage;
-pub use gates::{GateEmailPage, GatePermissionPage};
+pub use gates::{GateEmailPage, GatePermissionAllowPage, GatePermissionPage};
 pub use home::HomePage;
 pub use not_found::NotFoundDemoPage;
 pub use scroll_chrome::ScrollChromePage;

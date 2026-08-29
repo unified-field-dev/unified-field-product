@@ -39,7 +39,9 @@ real `AuthContext` (harness session keys — not a duplicate of lepton auth funn
 | `pw-welcome-admin-denied-sad` | sad | Signed-in without e2e admin / WelcomeAdmin sees deny MessageBar |
 | `pw-welcome-admin-featured-crud-happy` | happy | Seed `welcome_admin`; add Apps+Welcome; Featured updates; reorder; remove clears |
 | `pw-auth-gate-unverified-email-sad` | sad | Email verification gate dialog |
-| `pw-auth-gate-permission-denied-sad` | sad | Permission gate dialog (fail-closed) |
+| `pw-auth-gate-permission-denied-sad` | sad | Permission gate dialog when `e2e.permission.deny` |
+| `pw-auth-gate-permission-allow-happy` | happy | Seed `permission_allow`; `/gate/permission-allow` shows content |
+| `pw-auth-gate-permission-request-redirect-sad` | sad | Request Permission → `/permission/permissions` |
 | `pw-apps-index-list-filter-happy` | happy | Index lists apps; filter `Welcome` keeps welcome card |
 | `pw-apps-index-filter-empty-sad` | sad | Unknown filter → empty state |
 | `pw-apps-detail-happy` | happy | Index → Open → detail without not-found |
@@ -77,4 +79,18 @@ Harness seed: `POST /api/test/seed-data` with `{ "auth": "authenticated_verified
 (also `anonymous`, `authenticated_unverified`). Optional `page_views` and `usage_viewer`
 seed mem Spectra for usage-card fixtures (one process-global Spectra; isolate via
 viewer keys). Optional `welcome_admin: true` sets `uf_e2e_welcome_admin` so featured
-mutations use the harness Valence seam (no Gauge Chronon on this host).
+mutations use the harness Valence seam (session flag; not Gauge `PermissionBackend`).
+Optional `permission_allow: true` sets `uf_e2e_permission_allow` so the harness
+`PermissionBackend` allows `e2e.permission.allow` (still not live Gauge `actor_can`).
+
+## Runtime scope
+
+Product crates use **Valence** and **Spectra**. Production hosts also supply **Higgs**
+(session Valence / `from_request`) and, when wired, a host **Gauge**
+`PermissionBackend`. This e2e host stubs Higgs with tower-sessions and provides a
+harness `PermissionBackend` for gate allow/deny demos (not Gauge evaluation).
+
+**Chronon, Boson, and Photon are not product dependencies** — no crate in this
+workspace calls them. Host composition for those runtimes is covered by L5
+IsolatedLab (`uf-embedded-e2e`, `uf-site-e2e`, …). Real Gauge allow evaluation is
+covered where hosts call `wire_gauge_permissions()`, not here.

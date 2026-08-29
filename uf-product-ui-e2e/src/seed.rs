@@ -9,6 +9,7 @@ use spectra::try_log_event_at;
 use tower_sessions::Session;
 use uf_product::telemetry::usage::{E2E_USAGE_VIEWER_SESSION_KEY, PAGE_VIEW_LOG_TABLE};
 
+use crate::e2e_permissions::E2E_PERMISSION_ALLOW_SESSION_KEY;
 use crate::e2e_spectra::e2e_spectra;
 use crate::e2e_valence::e2e_valence;
 use crate::gate_demos::{write_e2e_auth_kind, E2eAuthKind};
@@ -37,6 +38,9 @@ pub struct SeedRequest {
     /// When true, set e2e welcome-admin session key for featured mutations.
     #[serde(default)]
     pub welcome_admin: bool,
+    /// When true, allow `e2e.permission.allow` via harness PermissionBackend.
+    #[serde(default)]
+    pub permission_allow: bool,
     /// Optional page-view events into mem Spectra (usage cards).
     #[serde(default)]
     pub page_views: Vec<SeedPageView>,
@@ -88,6 +92,18 @@ pub async fn seed_data(
     } else {
         session
             .remove::<bool>(E2E_WELCOME_ADMIN_SESSION_KEY)
+            .await
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    }
+
+    if body.permission_allow {
+        session
+            .insert(E2E_PERMISSION_ALLOW_SESSION_KEY, true)
+            .await
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    } else {
+        session
+            .remove::<bool>(E2E_PERMISSION_ALLOW_SESSION_KEY)
             .await
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     }
@@ -177,6 +193,7 @@ pub async fn seed_data(
         "auth": kind.as_str(),
         "usage_viewer": viewer,
         "welcome_admin": body.welcome_admin,
+        "permission_allow": body.permission_allow,
         "page_views": body.page_views.len(),
         "recent_preview": recent_preview,
         "workspace_search_seeded": workspace_search_seeded,

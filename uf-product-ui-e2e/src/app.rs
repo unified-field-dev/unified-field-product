@@ -18,8 +18,8 @@ use uf_welcome::UfWelcomeRoutes;
 use crate::gate_demos::E2eAuthProvider;
 use crate::harness_auth_menu::HarnessAuthMenu;
 use crate::pages::{
-    ComingSoonDemoPage, GateEmailPage, GatePermissionPage, HomePage, NotFoundDemoPage,
-    ScrollChromePage, UtilitiesOverridePage, WorkspaceSearchHitPage,
+    ComingSoonDemoPage, GateEmailPage, GatePermissionAllowPage, GatePermissionPage, HomePage,
+    NotFoundDemoPage, ScrollChromePage, UtilitiesOverridePage, WorkspaceSearchHitPage,
 };
 use uf_product::telemetry::{PageViewTracker, UfAppRouteEntry};
 
@@ -68,6 +68,7 @@ pub fn App() -> impl IntoView {
                             <Route path=path!("workspace-search-hit") view=WorkspaceSearchHitPage />
                             <Route path=path!("gate/email") view=GateEmailPage />
                             <Route path=path!("gate/permission") view=GatePermissionPage />
+                            <Route path=path!("gate/permission-allow") view=GatePermissionAllowPage />
                         </ParentRoute>
                         <Route path=path!("utilities-override") view=UtilitiesOverridePage />
                         <Route path=path!("coming-soon") view=ComingSoonDemoPage />
@@ -109,6 +110,7 @@ fn ChromeShell() -> impl IntoView {
                             <NavigationLink path="/welcome" value="/welcome" icon=icondata::AiSmileOutlined test_id="nav-welcome">"Welcome"</NavigationLink>
                             <NavigationLink path="/gate/email" value="/gate/email" icon=icondata::AiMailOutlined test_id="nav-gate-email">"Email gate"</NavigationLink>
                             <NavigationLink path="/gate/permission" value="/gate/permission" icon=icondata::AiLockOutlined test_id="nav-gate-permission">"Permission gate"</NavigationLink>
+                            <NavigationLink path="/gate/permission-allow" value="/gate/permission-allow" icon=icondata::AiSafetyCertificateOutlined test_id="nav-gate-permission-allow">"Permission allow"</NavigationLink>
                         </NavigationBody>
                     </Navigation>
                 </div>

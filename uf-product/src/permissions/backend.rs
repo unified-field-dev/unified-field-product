@@ -58,15 +58,31 @@ pub async fn has_permission(permission_name: &str) -> bool {
         .unwrap_or(false)
 }
 
-/// Route-guard helper: explicit `Ok(false)` when no backend is wired.
-#[cfg(feature = "ssr")]
+/// Route-guard helper: fail closed when no backend is wired.
+///
+/// Callable from SSR and hydrate (POST to the host). Hosts must
+/// [`provide_permission_backend`] in the Leptos request context.
+///
+/// # Errors
+///
+/// Returns [`ServerFnError`] when the backend check itself fails (mapped from
+/// backend errors). Missing backend or empty name yields [`Ok`]`(false)`.
+#[server(CheckPermissionByName)]
 pub async fn check_permission_by_name(permission_name: String) -> Result<bool, ServerFnError> {
-    let name = permission_name.trim();
-    if name.is_empty() {
-        return Ok(false);
+    #[cfg(feature = "ssr")]
+    {
+        let name = permission_name.trim();
+        if name.is_empty() {
+            return Ok(false);
+        }
+        let Some(backend) = use_permission_backend() else {
+            return Ok(false);
+        };
+        return backend.has_permission(name).await;
     }
-    let Some(backend) = use_permission_backend() else {
-        return Ok(false);
-    };
-    backend.has_permission(name).await
+    #[cfg(not(feature = "ssr"))]
+    {
+        let _ = permission_name;
+        Ok(false)
+    }
 }

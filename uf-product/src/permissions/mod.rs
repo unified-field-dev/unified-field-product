@@ -80,16 +80,19 @@
 //!
 //! # Runtime checks
 //!
-//! Hosts install a [`PermissionBackend`] via [`provide_permission_backend`] at
-//! shell bootstrap. [`require_permission`] and route gates **fail closed** when
+//! Hosts install a `PermissionBackend` via `provide_permission_backend` at
+//! shell bootstrap (SSR). `require_permission` and route gates **fail closed** when
 //! no backend is in context.
 
 mod backend;
 
+#[cfg(feature = "ssr")]
 pub use backend::{
-    check_permission_by_name, has_permission, provide_permission_backend, require_permission,
-    use_permission_backend, PermissionBackend,
+    has_permission, provide_permission_backend, require_permission, use_permission_backend,
+    PermissionBackend,
 };
+
+pub use backend::check_permission_by_name;
 
 /// Convert app-specific permission enums into canonical string names.
 ///

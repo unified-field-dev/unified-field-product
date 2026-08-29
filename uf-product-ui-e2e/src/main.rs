@@ -54,6 +54,7 @@ async fn main() -> anyhow::Result<()> {
             move || {
                 provide_context(e2e_spectra());
                 provide_context(uf_product_ui_e2e::e2e_valence());
+                uf_product_ui_e2e::wire_e2e_permissions();
             },
             move || shell(leptos_options_for_routes.clone()),
         )

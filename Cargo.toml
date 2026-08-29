@@ -231,7 +231,7 @@ site-pkg-dir = "pkg"
 style-file = "uf-product-ui-e2e/style/main.scss"
 assets-dir = "uf-product-ui-e2e/public"
 end2end-dir = "uf-product-ui-e2e/end2end"
-end2end-cmd = "npm test"
+end2end-cmd = "npm run test:permission-gates"
 site-addr = "127.0.0.1:3000"
 reload-port = 3001
 bin-features = ["ssr"]
@@ -248,18 +248,27 @@ uf-product-macros = { path = "uf-product-macros" }
 uf-search-core = { path = "uf-search-core" }
 
 [patch."https://github.com/unified-field-dev/valence"]
-uf-valence = { version = "0.1.5" }
-uf-valence-core = { version = "0.1.5" }
-uf-valence-codegen = { version = "0.1.5" }
-uf-valence-macros = { version = "0.1.5" }
-uf-valence-telemetry = { version = "0.1.5" }
-uf-valence-backend-mem = { version = "0.1.5" }
-uf-valence-backend-sqlite = { version = "0.1.5" }
-uf-valence-backend-sql = { version = "0.1.5" }
-uf-valence-schema-dsl = { version = "0.1.5" }
+uf-valence = { path = "../../L0-upstream-cores/valence/valence" }
+uf-valence-core = { path = "../../L0-upstream-cores/valence/valence-core" }
+uf-valence-codegen = { path = "../../L0-upstream-cores/valence/valence-codegen" }
+uf-valence-macros = { path = "../../L0-upstream-cores/valence/valence-macros" }
+uf-valence-telemetry = { path = "../../L0-upstream-cores/valence/valence-telemetry" }
+uf-valence-backend-mem = { path = "../../L0-upstream-cores/valence/valence-backend-mem" }
+uf-valence-backend-sqlite = { path = "../../L0-upstream-cores/valence/valence-backend-sqlite" }
+uf-valence-backend-sql = { path = "../../L0-upstream-cores/valence/valence-backend-sql" }
+uf-valence-schema-dsl = { path = "../../L0-upstream-cores/valence/valence-schema-dsl" }
 
 # Operator: override crates.io Orbital with local L0 checkout
 [patch.crates-io]
+uf-valence = { path = "../../L0-upstream-cores/valence/valence" }
+uf-valence-core = { path = "../../L0-upstream-cores/valence/valence-core" }
+uf-valence-codegen = { path = "../../L0-upstream-cores/valence/valence-codegen" }
+uf-valence-macros = { path = "../../L0-upstream-cores/valence/valence-macros" }
+uf-valence-telemetry = { path = "../../L0-upstream-cores/valence/valence-telemetry" }
+uf-valence-backend-mem = { path = "../../L0-upstream-cores/valence/valence-backend-mem" }
+uf-valence-backend-sqlite = { path = "../../L0-upstream-cores/valence/valence-backend-sqlite" }
+uf-valence-backend-sql = { path = "../../L0-upstream-cores/valence/valence-backend-sql" }
+uf-valence-schema-dsl = { path = "../../L0-upstream-cores/valence/valence-schema-dsl" }
 orbital-ui = { path = "../../L0-upstream-cores/orbital/orbital" }
 orbital-macros = { path = "../../L0-upstream-cores/orbital/orbital-macros" }
 orbital-shell = { path = "../../L0-upstream-cores/orbital/orbital-shell" }

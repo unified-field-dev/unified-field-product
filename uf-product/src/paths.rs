@@ -10,5 +10,5 @@ pub const USER_ACCOUNT_SETTINGS: &str = "/user/account-settings";
 /// Lepton user settings — appearance preferences page.
 pub const USER_APPEARANCE: &str = "/user/appearance";
 
-/// Permission management UI (Wave 4 gauge); stub path for auth-free guards.
-pub const PERMISSION_PERMISSIONS: &str = "/permissions";
+/// Permission management UI (Gauge `/permission` app); permissions index path.
+pub const PERMISSION_PERMISSIONS: &str = "/permission/permissions";

@@ -39,6 +39,7 @@ uf-search-core = { workspace = true, default-features = false }
 uf-welcome = { workspace = true, default-features = false }
 icondata = { workspace = true }
 wasm-bindgen = { workspace = true, optional = true }
+async-trait = { workspace = true, optional = true }
 chrono = { workspace = true, optional = true }
 spectra = { workspace = true, optional = true, features = ["mem"] }
 spectra-core = { workspace = true, optional = true }
@@ -80,6 +81,7 @@ ssr = [
     "dep:log",
     "dep:any_spawner",
     "dep:chrono",
+    "dep:async-trait",
     "dep:spectra",
     "dep:spectra-core",
     "dep:valence",

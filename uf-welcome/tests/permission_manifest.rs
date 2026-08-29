@@ -1,6 +1,5 @@
 //! `WelcomeAdmin` permission name contract.
 
-use uf_product::permissions::PermissionEnum;
 use uf_welcome::permissions::WelcomePermission;
 
 #[test]

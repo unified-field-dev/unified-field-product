@@ -12,9 +12,12 @@ export CARGO_TARGET_DIR=target-uf-product
 
 This workspace pins `rust-toolchain.toml` to `nightly` (Leptos `nightly` features + Orbital). Use that channel for the commands below.
 
+`Cargo.toml` path-patches `uf-valence*` to the local L0 checkout (`L0-upstream-cores/valence`). Crates.io 0.1.5 mem search mishandles `OR … LIKE`, which breaks workspace-search tests; CI already shallow-clones that tree.
+
 ## Layer 1 — Unit + integration
 
-Preferred contract crates (macros + codegen + apps directory; avoid full UI graph when possible):
+Preferred contract crates (macros + codegen + apps directory; avoid full UI graph when possible).
+CI `test` also runs `uf-product` and `uf-welcome` with `ssr`:
 
 ```bash
 cargo fmt -p uf-product-macros -p uf-codegen -p uf-apps -p uf-search-core -- --check
@@ -22,14 +25,14 @@ cargo clippy -p uf-product-macros -p uf-codegen -p uf-search-core --all-targets 
 cargo test -p uf-product-macros -p uf-codegen
 cargo test -p uf-search-core --features ssr
 cargo test -p uf-apps --features ssr
+cargo test -p uf-product --features ssr
+cargo test -p uf-welcome --features ssr
 cargo clippy -p uf-apps --features ssr --all-targets -- -D warnings
 ```
 
-Optional SSR helpers and offerings:
+Additional SSR checks (not in the default CI `test` job):
 
 ```bash
-cargo test -p uf-product --features ssr --lib
-cargo test -p uf-product --features ssr --lib workspace_search
 cargo check -p uf-help -p uf-appearance --features ssr
 cargo check -p uf-integrations --features ssr
 cargo check -p uf-integrations --no-default-features --features ssr
@@ -81,12 +84,27 @@ cargo dylint --all -p uf-integrations --no-deps -- --features hydrate
 Product operator surfaces (shell, app-bar utilities, search, coming-soon/404, auth
 gates, `/apps`, `/welcome`). Scenario IDs live in
 [`uf-product-ui-e2e/README.md`](../uf-product-ui-e2e/README.md).
+CI job `e2e` runs the same commands.
 
 ```bash
 cd uf-product-ui-e2e/end2end && npm ci && npx playwright install chromium
 cd ../..
 cargo leptos end-to-end --project uf-product-ui-e2e
 ```
+
+### Runtime scope (what this host boots)
+
+`uf-product-ui-e2e` is a library-owned Axum + Leptos host with **mem Valence**, **mem Spectra**, and a **session stub** for auth gates. That matches what product crates call.
+
+| Runtime | Product feature need? | This host |
+|---------|------------------------|-----------|
+| Valence | Yes | Mem, in context |
+| Spectra | Yes (usage / page views) | Mem |
+| Higgs | Yes on production hosts | Stubbed (session + harness Valence) |
+| Gauge (`PermissionBackend`) | Yes for real permission allow | Harness backend + `permission_allow` session flag (`e2e.permission.allow` / deny) |
+| Chronon / Boson / Photon | No (product never calls them) | Not installed |
+
+Chronon / Boson / Photon host composition belongs in L5 IsolatedLab (`uf-embedded-e2e`, `uf-site-e2e`, …). Real Gauge `actor_can` belongs with gauge / L5 hosts that call `wire_gauge_permissions()`. This host’s harness `PermissionBackend` covers gate allow/deny UI only. Do not add Chronon/Boson/Photon here to “complete” product e2e.
 
 ## Documentation gates
 

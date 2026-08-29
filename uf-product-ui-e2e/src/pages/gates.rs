@@ -27,7 +27,21 @@ pub fn GatePermissionPage() -> impl IntoView {
             <main data-testid="gate-permission-content" style="padding: 24px; max-width: 720px;">
                 <Flex vertical=true gap=FlexGap::Medium full_width=true>
                     <Title3>"Permission content"</Title3>
-                    <Body1>"Should not appear while gauge stubs fail closed."</Body1>
+                    <Body1>"Should not appear while the deny permission is checked."</Body1>
+                </Flex>
+            </main>
+        </RequireAuthenticated>
+    }
+}
+
+#[component]
+pub fn GatePermissionAllowPage() -> impl IntoView {
+    view! {
+        <RequireAuthenticated permission_name="e2e.permission.allow">
+            <main data-testid="gate-permission-allow-content" style="padding: 24px; max-width: 720px;">
+                <Flex vertical=true gap=FlexGap::Medium full_width=true>
+                    <Title3>"Permission allow content"</Title3>
+                    <Body1>"Visible when harness seeds permission_allow for e2e.permission.allow."</Body1>
                 </Flex>
             </main>
         </RequireAuthenticated>
