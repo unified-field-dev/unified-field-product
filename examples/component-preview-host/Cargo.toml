@@ -20,7 +20,7 @@ uf-product = { workspace = true, default-features = false }
 uf-component-preview = { workspace = true, default-features = false }
 
 # Monorepo operator layout: optional L3 zone previews merged at host startup.
-record-history-leptos = { path = "../../../../L3-zone-products/record-history/record-history-leptos", default-features = false, optional = true }
+record-history-leptos = { path = "../../../../L2-product-platform/record-history/record-history-leptos", default-features = false, optional = true }
 tag-app = { path = "../../../../L3-zone-products/tag/tag-app", default-features = false, optional = true }
 
 axum = { workspace = true, optional = true }
