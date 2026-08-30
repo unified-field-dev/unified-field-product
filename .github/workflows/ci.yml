@@ -132,6 +132,7 @@ jobs:
         working-directory: ${{ env.PRODUCT_WD }}
         run: cargo clippy -p uf-apps --features ssr --all-targets -- -D warnings
 
+  # Lighter packages share one runner (same Layer 1 commands as VERIFICATION.md).
   test:
     runs-on: ubuntu-latest
     steps:
@@ -183,12 +184,74 @@ jobs:
       - name: cargo test (uf-apps, ssr)
         working-directory: ${{ env.PRODUCT_WD }}
         run: cargo test -p uf-apps --features ssr
-      - name: cargo test (uf-product, ssr)
+
+  # Fat ssr test bins each get a fresh runner; mold + one retry for linker flakes
+  # (ld bus error / OOM on ubuntu-latest when linking uf-product / uf-welcome).
+  test-heavy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [uf-product, uf-welcome]
+    steps:
+      - name: Checkout product into unified-field layout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: ${{ env.PRODUCT_WD }}
+      - name: Checkout lepton (private path dep)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: unified-field-dev/lepton
+          path: ${{ env.UF_ROOT }}/L1-host-stack-kits/lepton
+          ssh-key: ${{ secrets.LEPTON_CLONE_SSH_KEY }}
+      - name: Checkout uf-notifications
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: unified-field-dev/uf-notifications
+          path: ${{ env.UF_ROOT }}/L2-product-platform/uf-notifications
+      - name: Checkout lepton-uf-app (private path dep)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: unified-field-dev/lepton-uf-app
+          path: ${{ env.UF_ROOT }}/L2-product-platform/lepton-uf-app
+          ssh-key: ${{ secrets.LEPTON_UF_APP_CLONE_SSH_KEY }}
+      - name: Checkout path-dep / patch siblings
+        run: |
+          set -euo pipefail
+          clone() {
+            local repo="$1" dest="$2" org="${3:-unified-field-dev}"
+            git clone --depth 1 "https://github.com/${org}/${repo}.git" "${dest}"
+          }
+          clone valence "${UF_ROOT}/L0-upstream-cores/valence"
+          clone orbital "${UF_ROOT}/L0-upstream-cores/orbital"
+          clone higgs "${UF_ROOT}/L1-host-stack-kits/higgs"
+          clone photon "${UF_ROOT}/L0-upstream-cores/photon"
+          clone photon-leptos "${UF_ROOT}/L1-host-stack-kits/photon-leptos"
+          clone chronon "${UF_ROOT}/L0-upstream-cores/chronon" unified-field-dev
+          clone chronon-coordinator-macros "${UF_ROOT}/L1-host-stack-kits/chronon-coordinator-macros" unified-field-dev
+          clone chronon-valence-identity "${UF_ROOT}/L1-host-stack-kits/chronon-valence-identity" unified-field-dev
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly
+      - name: Install mold
+        run: sudo apt-get update && sudo apt-get install -y mold
+      - name: cargo test (${{ matrix.package }}, ssr)
         working-directory: ${{ env.PRODUCT_WD }}
-        run: cargo test -p uf-product --features ssr
-      - name: cargo test (uf-welcome, ssr)
-        working-directory: ${{ env.PRODUCT_WD }}
-        run: cargo test -p uf-welcome --features ssr
+        env:
+          RUSTFLAGS: "-D warnings -C link-arg=-fuse-ld=mold"
+        run: |
+          set -euo pipefail
+          pkg="${{ matrix.package }}"
+          for attempt in 1 2; do
+            if cargo test -p "${pkg}" --features ssr; then
+              exit 0
+            fi
+            if [ "${attempt}" -eq 1 ]; then
+              echo "cargo test -p ${pkg} failed (possible linker flake); retrying once..."
+              sleep 5
+            fi
+          done
+          exit 1
 
   e2e:
     runs-on: ubuntu-latest
