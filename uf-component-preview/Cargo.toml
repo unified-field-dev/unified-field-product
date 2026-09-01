@@ -56,6 +56,7 @@ default = []
 preview = []
 hydrate = [
     "preview",
+    "dep:inventory",
     "leptos/hydrate",
     "uf-product/hydrate",
     "uf-product/preview",
