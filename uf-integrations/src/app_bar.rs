@@ -34,7 +34,8 @@ use uf_product::components::{
     HideOnScroll, LayoutSidebarToggle, MaterialCorners, MaterialElevation, MaterialVariant, Title3,
 };
 use uf_product::primitives::{
-    Avatar, AvatarColor, AvatarConfig, AvatarShape, Breadcrumb, BreadcrumbButton, BreadcrumbItem,
+    Avatar, AvatarColor, AvatarConfig, AvatarShape, Box, Breadcrumb, BreadcrumbButton,
+    BreadcrumbItem, Flex, FlexAlign, FlexGap, FlexJustify, Link,
 };
 use uf_product::provide_app_bar_menu_extras;
 use uf_product::theme::product_avatar_letter;
@@ -81,32 +82,9 @@ fn AppBarBranding(
     /// Homepage URL.
     homepage_url: String,
 ) -> impl IntoView {
-    let (style_sheet, class_names) = turf::inline_style_sheet_values! {
-        .Logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--orb-color-text-primary);
-        }
-
-        .LogoLink {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: inherit;
-            transition: opacity 0.2s ease;
-        }
-
-        .LogoLink:hover {
-            opacity: 0.8;
-        }
-    };
-
     view! {
-        <style>{style_sheet}</style>
-        <a href=homepage_url class=class_names.logo_link>
-            <div class=class_names.logo>
+        <Link href=homepage_url>
+            <Flex align=FlexAlign::Center gap=FlexGap::Medium>
                 <Avatar config=AvatarConfig {
                     initials: Some(avatar_letter),
                     name: Some(app_name.clone()),
@@ -116,8 +94,8 @@ fn AppBarBranding(
                     ..Default::default()
                 } />
                 <Title3>{app_name}</Title3>
-            </div>
-        </a>
+            </Flex>
+        </Link>
     }
 }
 
@@ -136,9 +114,9 @@ fn AppBarBreadcrumbs(
             {breadcrumbs.into_iter().map(|breadcrumb| {
                 view! {
                     <BreadcrumbItem>
-                        <a href=breadcrumb.url style="text-decoration: none; color: inherit;">
+                        <Link href=breadcrumb.url>
                             <BreadcrumbButton>{breadcrumb.title}</BreadcrumbButton>
-                        </a>
+                        </Link>
                     </BreadcrumbItem>
                 }
             }).collect::<Vec<_>>()}
@@ -237,43 +215,6 @@ pub fn UnifiedFieldAppBar(
         .or_else(|| use_context::<ShellSidebarToggle>().map(|ctx| ctx.0))
         .unwrap_or(false);
 
-    let (style_sheet, class_names) = turf::inline_style_sheet_values! {
-        .LeadingRow {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-        }
-
-        .TrailingRow {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            min-width: 0;
-            justify-content: flex-end;
-        }
-
-        .SearchContainer {
-            width: min(250px, 100%);
-            flex: 1 1 auto;
-            min-width: 0;
-            max-width: 250px;
-            margin-right: auto;
-        }
-
-        .Utilities {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .ChromeLocked {
-            pointer-events: none;
-        }
-    };
-
     // Same breakpoint as Layout sidebar overlay — one avatar/login menu on phones.
     let compact = use_breakpoint_down(Breakpoint::Md);
     provide_app_bar_menu_extras(compact.into());
@@ -281,16 +222,15 @@ pub fn UnifiedFieldAppBar(
     let utilities_children = app_bar_utilities.map(|AppBarUtilities { children }| children);
 
     view! {
-        <style>{style_sheet}</style>
         <HideOnScroll enabled=Signal::derive(move || compact.get())>
             <AppBar
-                class=Signal::derive(move || {
+                attr:style=move || {
                     if interactive {
                         String::new()
                     } else {
-                        class_names.chrome_locked.to_string()
+                        "pointer-events: none".to_string()
                     }
-                })
+                }
                 position=AppBarPosition::Sticky
                 density=AppBarDensity::Compact
             >
@@ -301,7 +241,7 @@ pub fn UnifiedFieldAppBar(
                     slot
                 />
                 <AppBarLeading slot>
-                    <div class=class_names.leading_row>
+                    <Flex align=FlexAlign::Center gap=FlexGap::Medium full_width=true>
                         {show_sidebar_toggle.then(|| view! {
                             <LayoutSidebarToggle />
                         })}
@@ -311,32 +251,48 @@ pub fn UnifiedFieldAppBar(
                             homepage_url=homepage_url
                         />
                         <AppBarBreadcrumbs breadcrumbs=breadcrumbs />
-                    </div>
+                    </Flex>
                 </AppBarLeading>
                 <AppBarTrailing slot>
-                    <div class=class_names.trailing_row data-testid="app-bar-trailing-row">
+                    <Flex
+                        align=FlexAlign::Center
+                        gap=FlexGap::Small
+                        justify=FlexJustify::End
+                        full_width=true
+                    >
+                        <div data-testid="app-bar-trailing-row">
                         {move || {
                             let utilities_view = match &utilities_children {
                                 Some(children) => children().into_any(),
                                 None => view! { <DefaultAppBarUtilities /> }.into_any(),
                             };
                             if compact.get() {
-                                // Compact: search icon → Dialog; utilities stay in trailing.
                                 view! {
-                                    <div class=class_names.utilities data-testid="app-bar-trailing-compact">
-                                        <WorkspaceSearchMobileTrigger />
-                                        {utilities_view}
+                                    <div data-testid="app-bar-trailing-compact">
+                                        <Flex align=FlexAlign::Center gap=FlexGap::Small>
+                                            <WorkspaceSearchMobileTrigger />
+                                            {utilities_view}
+                                        </Flex>
                                     </div>
                                 }
                                 .into_any()
                             } else {
                                 view! {
-                                    <div class=class_names.search_container data-testid="app-bar-search">
-                                        <AppBarSearchSlot />
-                                    </div>
-                                    <div class=class_names.utilities data-testid="app-bar-trailing">
-                                        {utilities_view}
-                                    </div>
+                                    <>
+                                        <Box
+                                            width="min(250px, 100%)"
+                                            style="flex: 1 1 auto; min-width: 0; max-width: 250px; margin-right: auto;"
+                                        >
+                                            <div data-testid="app-bar-search">
+                                                <AppBarSearchSlot />
+                                            </div>
+                                        </Box>
+                                        <div data-testid="app-bar-trailing">
+                                            <Flex align=FlexAlign::Center gap=FlexGap::Small>
+                                                {utilities_view}
+                                            </Flex>
+                                        </div>
+                                    </>
                                 }
                                 .into_any()
                             }
@@ -347,7 +303,8 @@ pub fn UnifiedFieldAppBar(
                         <div data-testid="app-bar-user-menu">
                             {auth_menu.map(|ShellAuthMenu { children }| children())}
                         </div>
-                    </div>
+                        </div>
+                    </Flex>
                 </AppBarTrailing>
             </AppBar>
         </HideOnScroll>
