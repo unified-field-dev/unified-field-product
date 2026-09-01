@@ -205,6 +205,14 @@ export async function openBellDropdown(page: Page) {
   });
 }
 
+/** Pixel width of the open bell dropdown panel (`notification-bell-dropdown`). */
+export async function measureBellDropdownWidth(page: Page): Promise<number> {
+  const panel = page.getByTestId("notification-bell-dropdown");
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  const box = await panel.boundingBox();
+  return box?.width ?? 0;
+}
+
 /** Wait until Orbital boot overlay dismisses (WASM hydrate + `hide_boot_loader`). */
 export async function waitForHydrated(page: Page) {
   await expect(page.locator("html")).toHaveAttribute("data-orbital-hydrated", "true", {

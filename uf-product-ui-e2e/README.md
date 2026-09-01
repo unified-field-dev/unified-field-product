@@ -57,6 +57,7 @@ real `AuthContext` (harness session keys — not a duplicate of lepton auth funn
 | `pw-apps-launcher-mobile-select-navigate-happy` | happy | Mobile select Welcome → `/welcome` |
 | `pw-notifications-unauth-gated-sad` | sad | `/notifications` auth gate when anonymous |
 | `pw-notifications-bell-dropdown-empty-sad` | sad | Signed-in bell opens; empty unread copy |
+| `pw-notifications-bell-dropdown-width-happy` | happy | Bell dropdown width stable (360–400px) empty vs long content |
 | `pw-notifications-bell-dropdown-items-happy` | happy | Seeded rows appear in bell dropdown |
 | `pw-notifications-bell-item-safe-link-happy` | happy | Safe URL navigates; unread badge drops |
 | `pw-notifications-bell-item-unsafe-url-sad` | sad | External URL stays on-app |
@@ -64,6 +65,7 @@ real `AuthContext` (harness session keys — not a duplicate of lepton auth funn
 | `pw-notifications-photon-push-badge-happy` | happy | Photon `/ws/notifications` bumps badge without reload |
 | `pw-notifications-photon-ws-blocked-sad` | sad | Closed WS leaves badge flat after append seed |
 | `pw-notifications-inbox-bell-happy` | happy | Inbox page + nav + seeded title |
+| `pw-notifications-inbox-min-width-happy` | happy | Inbox `ContentContainer` ≥ 360px at 320px viewport |
 | `pw-notifications-stats-grid-happy` | happy | Unread / Total / Today stats |
 | `pw-notifications-mark-read-happy` | happy | Mark read toggle |
 | `pw-notifications-mark-unread-happy` | happy | Mark unread round trip |

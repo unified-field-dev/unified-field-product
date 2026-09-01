@@ -18,6 +18,7 @@ use uf_product::primitives::Flex;
 use uuid::Uuid;
 
 use crate::server::{mark_all_notifications_read, NotificationReadFilter};
+use crate::surface_layout::INBOX_MIN_WIDTH;
 
 /// Full notification inbox: stats grid, search/filter toolbar, and a paginated list
 /// with optimistic read-state overrides while bulk operations are in flight.
@@ -53,7 +54,7 @@ pub fn NotificationsInboxPage() -> impl IntoView {
 
     view! {
         <div id="notifications-inbox-page">
-            <ContentContainer data_testid="notifications-inbox-page">
+            <ContentContainer data_testid="notifications-inbox-page" min_width=INBOX_MIN_WIDTH>
                 <Flex vertical=true gap=SpacingSize::Size240.flex_gap()>
                     <Flex vertical=true gap=SpacingSize::Size80.flex_gap()>
                         <Title3>"Notifications"</Title3>

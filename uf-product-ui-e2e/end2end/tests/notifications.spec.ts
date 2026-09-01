@@ -5,6 +5,7 @@ import {
   waitForHydrated,
   readBellBadgeCount,
   openBellDropdown,
+  measureBellDropdownWidth,
 } from "./fixtures";
 
 test.describe("pw-notifications-gate", () => {
@@ -31,6 +32,37 @@ test.describe("pw-notifications-bell", () => {
     await expect(page.getByText("No unread notifications.")).toBeVisible({
       timeout: 30_000,
     });
+  });
+
+  test("pw-notifications-bell-dropdown-width-happy", async ({ page }) => {
+    const longTitle =
+      "BellWidthProbeTitleThatWouldStretchTheDropdownWithoutAStableMinMaxBand";
+    const longMessage =
+      "BellWidthProbeMessageThatWouldStretchTheDropdownWithoutAStableMinMaxBand ".repeat(
+        6,
+      );
+
+    await seedAuth(page, "authenticated_verified", { notifications: [] });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForHydrated(page);
+    await openBellDropdown(page);
+    const emptyWidth = await measureBellDropdownWidth(page);
+    expect(emptyWidth).toBeGreaterThanOrEqual(360);
+    expect(emptyWidth).toBeLessThanOrEqual(400);
+
+    await page.keyboard.press("Escape");
+    await seedAuth(page, "authenticated_verified", {
+      notifications: [
+        { title: longTitle, message: longMessage, url: "/" },
+      ],
+    });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await waitForHydrated(page);
+    await openBellDropdown(page);
+    const populatedWidth = await measureBellDropdownWidth(page);
+    expect(populatedWidth).toBeGreaterThanOrEqual(360);
+    expect(populatedWidth).toBeLessThanOrEqual(400);
+    expect(Math.abs(emptyWidth - populatedWidth)).toBeLessThanOrEqual(1);
   });
 
   test("pw-notifications-bell-dropdown-items-happy", async ({ page }) => {
@@ -212,6 +244,21 @@ test.describe("pw-notifications-inbox", () => {
     });
     await expect(page.getByTestId("nav-notifications-inbox")).toBeAttached();
     await expect(page.getByText("E2E inbox ping")).toBeVisible({ timeout: 60_000 });
+  });
+
+  test("pw-notifications-inbox-min-width-happy", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await seedAuth(page, "authenticated_verified", {
+      notifications: [{ title: "InboxWidthProbe", message: "min width floor" }],
+    });
+    await page.goto("/notifications", { waitUntil: "domcontentloaded" });
+    await waitForHydrated(page);
+    await expect(page.getByTestId("notifications-inbox-page")).toBeVisible({
+      timeout: 60_000,
+    });
+    const box = await page.getByTestId("notifications-inbox-page").boundingBox();
+    expect(box).toBeTruthy();
+    expect(box!.width).toBeGreaterThanOrEqual(360);
   });
 
   test("pw-notifications-stats-grid-happy", async ({ page }) => {

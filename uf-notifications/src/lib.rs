@@ -157,6 +157,7 @@ mod pages;
 mod safe_url;
 /// Client-callable notification server functions, re-exported from `uf-notifications-api`.
 pub mod server;
+mod surface_layout;
 
 pub use components::NotificationBell;
 
@@ -166,6 +167,7 @@ pub use lazy_routes::NotificationsAuthGuardRouteView;
 #[cfg(feature = "lazy-routes")]
 pub use lazy_routes::{prefetch_family, NotificationsInboxRoute};
 pub use pages::NotificationsInboxPage;
+pub use surface_layout::{BELL_DROPDOWN_MAX_WIDTH, BELL_DROPDOWN_MIN_WIDTH, INBOX_MIN_WIDTH};
 
 /// `uf_app!` id for the notifications product (`notifications-mount-host` mirrors this).
 pub const NOTIFICATIONS_APP_ID: &str = "notifications";

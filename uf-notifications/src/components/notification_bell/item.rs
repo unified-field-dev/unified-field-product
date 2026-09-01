@@ -54,6 +54,26 @@ pub fn NotificationBellItem(
             width: 100%;
             box-sizing: border-box;
         }
+
+        .TitleRow {
+            min-width: 0;
+            flex: 1 1 0%;
+        }
+
+        .TitleText {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        .MessageText {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-width: 0;
+        }
     };
 
     let item_cls = class_names.item.to_string();
@@ -70,17 +90,17 @@ pub fn NotificationBellItem(
             >
                 <CardButtonArea on_click=open>
                     <CardHeader>
-                        <Flex align=FlexAlign::Center gap=FlexGap::Small>
+                        <Flex align=FlexAlign::Center gap=FlexGap::Small class=class_names.title_row.to_string()>
                             <Badge
                                 size=Signal::from(BadgeSize::ExtraSmall)
                                 color=Signal::from(BadgeColor::Danger)
                             />
-                            <Subtitle1>{title}</Subtitle1>
+                            <Subtitle1 class=class_names.title_text.to_string()>{title}</Subtitle1>
                         </Flex>
                     </CardHeader>
                     <CardContent>
                         <Flex vertical=true gap=FlexGap::Size(4)>
-                            <Body1 block=true wrap=true>{message}</Body1>
+                            <Body1 block=true class=class_names.message_text.to_string()>{message}</Body1>
                             <Caption1>{created_at}</Caption1>
                         </Flex>
                     </CardContent>

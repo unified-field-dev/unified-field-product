@@ -1,6 +1,7 @@
 //! `NotificationBell` — the top-level composition component.
 
 use crate::server::{get_unread_count, get_unread_notifications_page, subscribe_get_unread_count};
+use crate::surface_layout::{BELL_DROPDOWN_MAX_WIDTH, BELL_DROPDOWN_MIN_WIDTH};
 use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
 use leptos_router::NavigateOptions;
@@ -59,7 +60,13 @@ fn NotificationBellAuthenticated() -> impl IntoView {
     };
 
     view! {
-        <Menu on_select=handle_select position=MenuPosition::BottomEnd>
+        <Menu
+            on_select=handle_select
+            position=MenuPosition::BottomEnd
+            min_width=BELL_DROPDOWN_MIN_WIDTH
+            max_width=BELL_DROPDOWN_MAX_WIDTH
+            data_testid="notification-bell-dropdown"
+        >
             <MenuTrigger slot>
                 <NotificationBellTrigger count_res=count_res />
             </MenuTrigger>
