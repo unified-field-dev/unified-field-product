@@ -103,9 +103,11 @@
 //!
 //! ## Runtime semantics
 //!
-//! - **Route matching** — step `route` is exact pathname equality except
-//!   `"/apps/:app_name"`, which matches `/apps/{slug}` (one segment). Valence rows
-//!   store the inventory pattern, not the live slug ([`inventory_route_keys_for_pathname`]).
+//! - **Route matching** — step `route` is exact pathname equality, or a
+//!   `:param` segment pattern that matches one non-empty path segment per
+//!   parameter (for example `"/apps/:app_name"`, `"/boson/tasks/:task_name"`).
+//!   Valence rows store the inventory pattern, not the live slug
+//!   ([`inventory_route_keys_for_pathname`]).
 //! - **Pending** — no visit row, or visit with `replay == true` ([`compute_pending`]).
 //! - **Signed-out** — progress lives under [`LOCAL_STORAGE_KEY`]; on first signed-in
 //!   write, [`help_mark_steps_seen`] merges missing local rows into Valence
