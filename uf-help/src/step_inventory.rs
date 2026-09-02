@@ -57,19 +57,33 @@ pub fn collect_help_steps() -> Vec<&'static HelpStepDescriptor> {
 
 /// Whether inventory `pattern` applies to browser `pathname`.
 ///
-/// Exact equality always matches. Otherwise, when `pattern` contains at least
-/// one `:param` segment, each literal segment must equal the corresponding
-/// pathname segment and each `:param` must match one non-empty segment (no
-/// `/`). Segment counts must match after trimming a trailing `/`.
+/// Exact equality always matches. The Permission index inventory key
+/// [`/permission/permissions`] also matches bare [`/permission`] (same page,
+/// two URLs). Otherwise, when `pattern` contains at least one `:param`
+/// segment, each literal segment must equal the corresponding pathname
+/// segment and each `:param` must match one non-empty segment (no `/`).
+/// Segment counts must match after trimming a trailing `/`.
 #[must_use]
 pub fn route_matches(pattern: &str, pathname: &str) -> bool {
     if pattern == pathname {
+        return true;
+    }
+    if matches_permission_index_alias(pattern, pathname) {
         return true;
     }
     if !pattern.contains(':') {
         return false;
     }
     matches_param_pattern(pattern, pathname)
+}
+
+/// Inventory `/permission/permissions` also covers bare `/permission`.
+fn matches_permission_index_alias(pattern: &str, pathname: &str) -> bool {
+    if pattern != "/permission/permissions" {
+        return false;
+    }
+    let path = pathname.trim_end_matches('/');
+    path == "/permission" || path == "/permission/permissions"
 }
 
 fn path_segments(path: &str) -> Vec<&str> {
@@ -184,5 +198,25 @@ mod tests {
     #[test]
     fn route_matches_rejects_empty_param_name() {
         assert!(!route_matches("/foo/:/bar", "/foo/x/bar"));
+    }
+
+    #[test]
+    fn route_matches_permission_index_alias() {
+        assert!(route_matches(
+            "/permission/permissions",
+            "/permission/permissions"
+        ));
+        assert!(route_matches("/permission/permissions", "/permission"));
+        assert!(route_matches("/permission/permissions", "/permission/"));
+        assert!(!route_matches(
+            "/permission/permissions",
+            "/permission/permissions/abc"
+        ));
+        assert!(!route_matches("/permission", "/permission/permissions"));
+        assert!(route_matches(
+            "/permission/permissions/:id",
+            "/permission/permissions/abc"
+        ));
+        assert!(!route_matches("/permission/permissions/:id", "/permission"));
     }
 }
