@@ -67,7 +67,8 @@ for the default app-bar Help utility.
 
 ### 4. Runtime
 
-- **Routes** — exact pathname match, except `"/apps/:app_name"` for one-segment app overviews.
+- **Routes** — exact pathname match, or `:param` segments (one non-empty path
+  segment each), for example `/apps/:app_name` or `/boson/tasks/:task_name/config`.
 - **Signed-out** — `uf.help.tour_steps` in `localStorage`; merged into Valence on first authenticated write.
 - **Replay** — Help → Replay spotlight tour affects the current route only.
 - **Gates** — auto-play pauses while `RequireAuthenticated` empty states are active.

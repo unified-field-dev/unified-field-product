@@ -6,8 +6,9 @@
 //! retains submissions (see `uf_apps::ensure_help_linked`).
 //!
 //! [`collect_help_steps_for_route`] filters by [`route_matches`]: exact pathname
-//! equality, plus the `"/apps/:app_name"` pattern for single-segment app overview
-//! paths. [`inventory_route_keys_for_pathname`] returns the pattern keys used when
+//! equality, or a segment pattern where `:param` matches one non-empty path
+//! segment (for example `"/apps/:app_name"` or `"/boson/tasks/:task_name/config"`).
+//! [`inventory_route_keys_for_pathname`] returns the pattern keys used when
 //! reading or writing Valence visit rows (not the live browser slug).
 
 use leptos::prelude::AnyView;
@@ -21,8 +22,9 @@ pub struct HelpStepDescriptor {
     /// Route this step belongs to.
     ///
     /// Usually an exact pathname (for example `"/apps"` or `"/welcome"`).
-    /// The pattern `"/apps/:app_name"` matches any single-segment app overview
-    /// path such as `/apps/welcome` (not bare `/apps` or multi-segment paths).
+    /// Patterns may include `:param` segments that match one non-empty path
+    /// segment each (for example `"/apps/:app_name"` or
+    /// `"/boson/tasks/:task_name/config"`).
     pub route: &'static str,
     /// Stable per-step identity within the route.
     pub feature_highlight: &'static str,
@@ -55,25 +57,55 @@ pub fn collect_help_steps() -> Vec<&'static HelpStepDescriptor> {
 
 /// Whether inventory `pattern` applies to browser `pathname`.
 ///
-/// Exact equality for normal routes. `"/apps/:app_name"` matches pathnames with
-/// exactly two segments (`apps` + non-empty slug), not `/apps` or `/apps/a/b`.
+/// Exact equality always matches. The Permission index inventory key
+/// [`/permission/permissions`] also matches bare [`/permission`] (same page,
+/// two URLs). Otherwise, when `pattern` contains at least one `:param`
+/// segment, each literal segment must equal the corresponding pathname
+/// segment and each `:param` must match one non-empty segment (no `/`).
+/// Segment counts must match after trimming a trailing `/`.
 #[must_use]
 pub fn route_matches(pattern: &str, pathname: &str) -> bool {
     if pattern == pathname {
         return true;
     }
-    if pattern == "/apps/:app_name" {
-        return matches_apps_app_name(pathname);
+    if matches_permission_index_alias(pattern, pathname) {
+        return true;
     }
-    false
+    if !pattern.contains(':') {
+        return false;
+    }
+    matches_param_pattern(pattern, pathname)
 }
 
-fn matches_apps_app_name(pathname: &str) -> bool {
-    let path = pathname.trim_end_matches('/');
-    let Some(rest) = path.strip_prefix("/apps/") else {
+/// Inventory `/permission/permissions` also covers bare `/permission`.
+fn matches_permission_index_alias(pattern: &str, pathname: &str) -> bool {
+    if pattern != "/permission/permissions" {
         return false;
-    };
-    !rest.is_empty() && !rest.contains('/')
+    }
+    let path = pathname.trim_end_matches('/');
+    path == "/permission" || path == "/permission/permissions"
+}
+
+fn path_segments(path: &str) -> Vec<&str> {
+    path.trim_end_matches('/')
+        .split('/')
+        .filter(|s| !s.is_empty())
+        .collect()
+}
+
+fn matches_param_pattern(pattern: &str, pathname: &str) -> bool {
+    let pat = path_segments(pattern);
+    let live = path_segments(pathname);
+    if pat.len() != live.len() || pat.is_empty() {
+        return false;
+    }
+    pat.iter().zip(live.iter()).all(|(p, l)| {
+        if let Some(name) = p.strip_prefix(':') {
+            !name.is_empty() && !l.is_empty() && !l.contains('/')
+        } else {
+            p == l
+        }
+    })
 }
 
 /// Collect help steps whose [`HelpStepDescriptor::route`] matches `pathname`.
@@ -87,7 +119,7 @@ pub fn collect_help_steps_for_route(pathname: &str) -> Vec<&'static HelpStepDesc
 
 /// Distinct inventory route keys that apply to `pathname` (exact or pattern).
 ///
-/// Used when reading/writing Valence visits so rows keyed by
+/// Used when reading/writing Valence visits so rows keyed by a pattern such as
 /// `"/apps/:app_name"` are found while browsing `/apps/{slug}`.
 #[must_use]
 pub fn inventory_route_keys_for_pathname(pathname: &str) -> Vec<&'static str> {
@@ -137,5 +169,54 @@ mod tests {
         assert!(!route_matches("/apps/:app_name", "/apps/"));
         assert!(!route_matches("/apps/:app_name", "/apps/foo/bar"));
         assert!(!route_matches("/apps/:app_name", "/welcome"));
+    }
+
+    #[test]
+    fn route_matches_multi_segment_param_patterns() {
+        assert!(route_matches(
+            "/boson/tasks/:task_name",
+            "/boson/tasks/send_mail"
+        ));
+        assert!(route_matches(
+            "/boson/tasks/:task_name/config",
+            "/boson/tasks/send_mail/config"
+        ));
+        assert!(route_matches("/boson/runs/:id", "/boson/runs/abc-123"));
+        assert!(!route_matches(
+            "/boson/tasks/:task_name",
+            "/boson/tasks/send_mail/config"
+        ));
+        assert!(!route_matches(
+            "/boson/tasks/:task_name/config",
+            "/boson/tasks/send_mail"
+        ));
+        assert!(!route_matches("/boson/runs/:id", "/boson/runs"));
+        assert!(!route_matches("/boson/runs/:id", "/boson/runs/a/b"));
+        assert!(!route_matches("/boson/tasks/:task_name", "/boson/tasks/"));
+    }
+
+    #[test]
+    fn route_matches_rejects_empty_param_name() {
+        assert!(!route_matches("/foo/:/bar", "/foo/x/bar"));
+    }
+
+    #[test]
+    fn route_matches_permission_index_alias() {
+        assert!(route_matches(
+            "/permission/permissions",
+            "/permission/permissions"
+        ));
+        assert!(route_matches("/permission/permissions", "/permission"));
+        assert!(route_matches("/permission/permissions", "/permission/"));
+        assert!(!route_matches(
+            "/permission/permissions",
+            "/permission/permissions/abc"
+        ));
+        assert!(!route_matches("/permission", "/permission/permissions"));
+        assert!(route_matches(
+            "/permission/permissions/:id",
+            "/permission/permissions/abc"
+        ));
+        assert!(!route_matches("/permission/permissions/:id", "/permission"));
     }
 }
