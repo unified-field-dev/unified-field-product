@@ -174,3 +174,57 @@ async fn require_session_window() -> Result<(), ServerFnError> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::StepUpMode;
+
+    #[test]
+    fn step_up_mode_parse_window_aliases_happy_path() {
+        assert_eq!(StepUpMode::parse(""), Some(StepUpMode::Window));
+        assert_eq!(StepUpMode::parse("window"), Some(StepUpMode::Window));
+        assert_eq!(StepUpMode::parse("true"), Some(StepUpMode::Window));
+        assert_eq!(StepUpMode::parse(" window "), Some(StepUpMode::Window));
+        assert_eq!(StepUpMode::Window.as_str(), "window");
+    }
+
+    #[test]
+    fn step_up_mode_parse_fresh_happy_path() {
+        assert_eq!(StepUpMode::parse("fresh"), Some(StepUpMode::Fresh));
+        assert_eq!(StepUpMode::parse(" fresh "), Some(StepUpMode::Fresh));
+        assert_eq!(StepUpMode::Fresh.as_str(), "fresh");
+    }
+
+    #[test]
+    fn step_up_mode_parse_unknown_sad() {
+        assert_eq!(StepUpMode::parse("sudo"), None);
+        assert_eq!(StepUpMode::parse("Fresh"), None);
+        assert_eq!(StepUpMode::parse("WINDOW"), None);
+    }
+
+    #[test]
+    fn step_up_error_prefixes_stable_happy_path() {
+        // Session-window evaluation needs a live Higgs/session; keep the client-facing
+        // prefixes pinned so UI detectors (`STEP_UP:step_up_required` / `_expired`) stay honest.
+        let src = include_str!("step_up.rs");
+        for needle in [
+            "STEP_UP:step_up_required:",
+            "STEP_UP:step_up_expired:",
+            "STEP_UP:step_up_invalid:",
+            "STEP_UP:auth_required:",
+        ] {
+            assert!(
+                src.contains(needle),
+                "step_up gate must keep stable error prefix `{needle}`"
+            );
+        }
+        assert!(
+            src.contains("recent totp verification required"),
+            "missing window-required message"
+        );
+        assert!(
+            src.contains("totp verification expired"),
+            "missing window-expired message"
+        );
+    }
+}

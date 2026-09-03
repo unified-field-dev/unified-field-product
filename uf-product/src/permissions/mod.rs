@@ -102,6 +102,8 @@ pub use backend::check_permission_by_name;
 #[cfg(feature = "ssr")]
 pub use step_up::{
     provide_step_up_backend, require_step_up, use_step_up_backend, StepUpBackend, StepUpMode,
+    STEP_UP_AUTH_HASH_KEY, STEP_UP_EXPIRES_AT_KEY, STEP_UP_SCOPE_KEY, STEP_UP_SCOPE_SENSITIVE,
+    STEP_UP_TTL_SECS, STEP_UP_USER_ID_KEY, STEP_UP_VERIFIED_AT_KEY,
 };
 
 /// Convert app-specific permission enums into canonical string names.
