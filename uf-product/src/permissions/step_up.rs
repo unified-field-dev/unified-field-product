@@ -227,4 +227,16 @@ mod tests {
             "missing window-expired message"
         );
     }
+
+    #[test]
+    fn fresh_mode_skips_session_window_happy_path() {
+        // TM-3 / TM-12: `require_step_up("fresh")` must not consult the sudo window.
+        let src = include_str!("step_up.rs");
+        assert!(
+            src.contains("StepUpMode::Fresh =>")
+                && src.contains("Ok(())")
+                && src.contains("verify_fresh_totp"),
+            "Fresh mode must return Ok without reading the session bag"
+        );
+    }
 }
