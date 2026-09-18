@@ -537,7 +537,7 @@ dependencies = [
  "log",
  "serde",
  "serde_json",
- "uf-quark 0.1.3 (git+https://github.com/unified-field-dev/quark?branch=main)",
+ "uf-quark",
  "uf-valence",
 ]
 
@@ -578,7 +578,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
- "uf-quark 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uf-quark",
 ]
 
 [[package]]
@@ -1401,7 +1401,7 @@ dependencies = [
  "serde_json",
  "uf-notifications-core",
  "uf-product-macros 0.1.0 (git+https://github.com/unified-field-dev/unified-field-product?branch=main)",
- "uf-quark 0.1.3 (git+https://github.com/unified-field-dev/quark?branch=main)",
+ "uf-quark",
  "uf-search-core 0.1.0 (git+https://github.com/unified-field-dev/unified-field-product?branch=main)",
  "uf-spectra",
  "uf-spectra-core",
@@ -3494,39 +3494,12 @@ source = "git+https://github.com/unified-field-dev/photon-leptos?branch=main#c88
 dependencies = [
  "axum",
  "futures",
- "photon-backend 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
- "photon-runtime 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
+ "photon-backend",
+ "photon-runtime",
  "serde_json",
  "thiserror 2.0.20",
  "tokio",
- "uf-quark 0.1.3 (git+https://github.com/unified-field-dev/quark?branch=main)",
-]
-
-[[package]]
-name = "photon-backend"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51bbf7575ee4f8e7b1e61c2ab8114be793f92cbf4def7c3e17f533aaffe93d65"
-dependencies = [
- "anyhow",
- "async-stream",
- "async-trait",
- "base64",
- "chacha20poly1305",
- "chrono",
- "dashmap 6.2.1",
- "futures",
- "photon-telemetry 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "rand_core 0.6.4",
- "serde",
- "serde_json",
- "thiserror 2.0.20",
- "tokio",
- "tracing",
- "uf-photon-core 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "uf-quark 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "uuid",
- "zeroize",
+ "uf-quark",
 ]
 
 [[package]]
@@ -3542,15 +3515,15 @@ dependencies = [
  "chrono",
  "dashmap 6.2.1",
  "futures",
- "photon-telemetry 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
+ "photon-telemetry",
  "rand_core 0.6.4",
  "serde",
  "serde_json",
  "thiserror 2.0.20",
  "tokio",
  "tracing",
- "uf-photon-core 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
- "uf-quark 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uf-photon-core",
+ "uf-quark",
  "uuid",
  "zeroize",
 ]
@@ -3572,8 +3545,8 @@ dependencies = [
  "thiserror 2.0.20",
  "tokio",
  "tracing",
- "uf-photon 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "uf-quark 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uf-photon",
+ "uf-quark",
 ]
 
 [[package]]
@@ -3590,17 +3563,6 @@ dependencies = [
 [[package]]
 name = "photon-macros"
 version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "57bc69fc567436274d7c4a361e6f2a80557f91f05aa61b6e7b728e27d8516837"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
-name = "photon-macros"
-version = "0.1.4"
 source = "git+https://github.com/unified-field-dev/photon?branch=main#d8942b609e86cefdfbbf4ad105be7291f8fee908"
 dependencies = [
  "proc-macro2",
@@ -3611,43 +3573,17 @@ dependencies = [
 [[package]]
 name = "photon-runtime"
 version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58d0f2af8bda1fa7aa8678558de391bbe107b930cad35e582897dbc435585dc2"
-dependencies = [
- "futures",
- "photon-backend 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "photon-telemetry 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde",
- "serde_json",
- "tokio",
- "tokio-util",
- "tracing",
- "uf-photon-core 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "photon-runtime"
-version = "0.1.4"
 source = "git+https://github.com/unified-field-dev/photon?branch=main#d8942b609e86cefdfbbf4ad105be7291f8fee908"
 dependencies = [
  "futures",
- "photon-backend 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
- "photon-telemetry 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
+ "photon-backend",
+ "photon-telemetry",
  "serde",
  "serde_json",
  "tokio",
  "tokio-util",
  "tracing",
- "uf-photon-core 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
-]
-
-[[package]]
-name = "photon-telemetry"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5c5a39aabec7157deffc7a2001f9cf7996a1bf2234adcd7b3d9b78e74ff2f1c"
-dependencies = [
- "serde_json",
+ "uf-photon-core",
 ]
 
 [[package]]
@@ -4125,7 +4061,7 @@ dependencies = [
 [[package]]
 name = "record-history"
 version = "0.1.0"
-source = "git+https://github.com/unified-field-dev/record-history?branch=main#baa0327c479eae114d5c00d562154a3a23af8ed5"
+source = "git+https://github.com/unified-field-dev/record-history?branch=main#39037b44082d95996135f8d70f476bebacd250c0"
 dependencies = [
  "async-trait",
  "chrono",
@@ -5875,7 +5811,7 @@ dependencies = [
  "serde_json",
  "tracing",
  "uf-notifications-core",
- "uf-photon 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
+ "uf-photon",
  "uf-valence",
  "uuid",
 ]
@@ -5892,7 +5828,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
- "uf-photon 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
+ "uf-photon",
  "uf-valence",
  "uf-valence-codegen",
  "uuid",
@@ -5901,39 +5837,14 @@ dependencies = [
 [[package]]
 name = "uf-photon"
 version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1fbb65aacc2ab5c22190945f301a7448719b02bda720cd60459c28113a39ffb"
-dependencies = [
- "photon-backend 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "photon-macros 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "photon-runtime 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "photon-telemetry 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "uf-photon-core 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "uf-quark 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "uf-photon"
-version = "0.1.4"
 source = "git+https://github.com/unified-field-dev/photon?branch=main#d8942b609e86cefdfbbf4ad105be7291f8fee908"
 dependencies = [
- "photon-backend 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
- "photon-macros 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
- "photon-runtime 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
- "photon-telemetry 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
- "uf-photon-core 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
- "uf-quark 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "uf-photon-core"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b810fbf7082a14953a9d0e00e3c268e17ab21cf7ba0f904a39713edf8572c3e7"
-dependencies = [
- "serde",
- "serde_json",
- "thiserror 2.0.20",
+ "photon-backend",
+ "photon-macros",
+ "photon-runtime",
+ "photon-telemetry",
+ "uf-photon-core",
+ "uf-quark",
 ]
 
 [[package]]
@@ -5976,7 +5887,7 @@ dependencies = [
  "tower-sessions",
  "turf",
  "uf-product-macros 0.1.0",
- "uf-quark 0.1.3 (git+https://github.com/unified-field-dev/quark?branch=main)",
+ "uf-quark",
  "uf-search-core 0.1.0",
  "uf-spectra",
  "uf-spectra-core",
@@ -6040,7 +5951,7 @@ dependencies = [
  "uf-integrations",
  "uf-notifications",
  "uf-notifications-core",
- "uf-photon 0.1.4 (git+https://github.com/unified-field-dev/photon?branch=main)",
+ "uf-photon",
  "uf-product",
  "uf-search-core 0.1.0",
  "uf-spectra",
@@ -6048,15 +5959,6 @@ dependencies = [
  "uf-valence",
  "uf-welcome",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "uf-quark"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f500ee85e77944565c22d324250caa362257b68274733b2998226a8f563edb0"
-dependencies = [
- "inventory",
 ]
 
 [[package]]
@@ -6074,7 +5976,7 @@ dependencies = [
  "anyhow",
  "serde",
  "tokio",
- "uf-quark 0.1.3 (git+https://github.com/unified-field-dev/quark?branch=main)",
+ "uf-quark",
  "uf-valence",
 ]
 
@@ -6085,7 +5987,7 @@ source = "git+https://github.com/unified-field-dev/unified-field-product?branch=
 dependencies = [
  "anyhow",
  "serde",
- "uf-quark 0.1.3 (git+https://github.com/unified-field-dev/quark?branch=main)",
+ "uf-quark",
  "uf-valence",
 ]
 
@@ -6118,13 +6020,13 @@ dependencies = [
  "tokio",
  "toml 0.8.23",
  "tracing",
- "uf-quark 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uf-quark",
 ]
 
 [[package]]
 name = "uf-valence"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "uf-valence-backend-hybrid",
  "uf-valence-backend-indradb",
@@ -6138,7 +6040,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-hybrid"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "async-trait",
  "serde",
@@ -6151,7 +6053,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-indradb"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "async-trait",
  "indradb-lib",
@@ -6164,7 +6066,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-mem"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -6175,7 +6077,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-postgres"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -6188,7 +6090,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-sql"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "serde",
  "serde_json",
@@ -6203,7 +6105,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-backend-sqlite"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "async-trait",
  "serde_json",
@@ -6216,7 +6118,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-codegen"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "anyhow",
  "prettyplease",
@@ -6230,7 +6132,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-core"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "async-trait",
  "chrono",
@@ -6249,7 +6151,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-macros"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -6260,7 +6162,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-schema-dsl"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -6270,7 +6172,7 @@ dependencies = [
 [[package]]
 name = "uf-valence-telemetry"
 version = "0.1.5"
-source = "git+https://github.com/deathbreakfast/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
+source = "git+https://github.com/unified-field-dev/valence?branch=main#cf439f50caed958e71873b6dd50a7519bdbc6151"
 dependencies = [
  "serde_json",
 ]
@@ -6302,7 +6204,7 @@ dependencies = [
  "uf-integrations",
  "uf-product",
  "uf-product-macros 0.1.0",
- "uf-quark 0.1.3 (git+https://github.com/unified-field-dev/quark?branch=main)",
+ "uf-quark",
  "uf-spectra",
  "uf-valence",
  "uf-valence-codegen",
