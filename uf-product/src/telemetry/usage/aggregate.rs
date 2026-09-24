@@ -75,7 +75,7 @@ pub fn aggregate_recent(rows: &[VisitRow], viewer_key: &str, limit: usize) -> Ve
 }
 
 /// Most-used apps for a viewer: count visits, top-N by count then latest `ts`.
-pub fn aggregate_most_used(rows: &[VisitRow], viewer_key: &str, limit: usize) -> Vec<RankedApp> {
+pub fn aggregate_most(rows: &[VisitRow], viewer_key: &str, limit: usize) -> Vec<RankedApp> {
     aggregate_counts(rows.iter().filter(|r| r.viewer_key == viewer_key), limit)
 }
 
@@ -176,7 +176,7 @@ mod tests {
             row("valence", "u1", 4),
             row("shell", "u1", 5),
         ];
-        let got = aggregate_most_used(&rows, "u1", 8);
+        let got = aggregate_most(&rows, "u1", 8);
         assert_eq!(got.len(), 2);
         assert_eq!(got[0].app_id, "counter");
         assert_eq!(got[0].count, 2);
