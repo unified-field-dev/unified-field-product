@@ -104,7 +104,7 @@ pub async fn most_used_for_viewer_on(
     opts: &UsageQueryOptions,
 ) -> Result<Vec<UsageAppLink>, UsageQueryError> {
     let rows = fetch_visits(router, Some(viewer_key), opts).await?;
-    Ok(resolve_usage_links(&aggregate_most(
+    Ok(resolve_usage_links(&aggregate_most_used(
         &rows,
         viewer_key,
         opts.limit_apps,
