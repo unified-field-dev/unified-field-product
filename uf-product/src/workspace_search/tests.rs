@@ -473,7 +473,7 @@ async fn writer_upsert_renews_ttl_happy() {
         "unified_field_search_document",
         &id,
         &v,
-        valence::use_!(r#"**Test:** Fixture row load for `workspace_search` so the suite can assert TTL renew stamps on search documents. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `workspace_search` so the suite can assert TTL renew stamps on search documents. CI and developers running the suite only."),
     )
     .await
     .expect("raw1")
@@ -490,7 +490,7 @@ async fn writer_upsert_renews_ttl_happy() {
         "unified_field_search_document",
         &id,
         &v,
-        valence::use_!(r#"**Test:** Fixture row load for `workspace_search` so the suite can assert TTL renew stamps on search documents. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `workspace_search` so the suite can assert TTL renew stamps on search documents. CI and developers running the suite only."),
     )
     .await
     .expect("raw2")
