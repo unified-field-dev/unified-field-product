@@ -5919,6 +5919,7 @@ dependencies = [
  "higgs",
  "higgs-identity",
  "icondata",
+ "inventory",
  "lepton-identity",
  "leptos",
  "leptos_axum",
