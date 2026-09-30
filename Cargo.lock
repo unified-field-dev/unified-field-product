@@ -5716,6 +5716,7 @@ dependencies = [
  "uf-product-macros 0.1.0",
  "uf-valence",
  "uuid",
+ "web-sys",
 ]
 
 [[package]]
